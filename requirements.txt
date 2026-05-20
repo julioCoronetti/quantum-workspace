@@ -1,0 +1,5 @@
+qiskit
+qiskit-machine-learning
+qiskit-optimization
+qiskit-algorithms
+scikit-learn
