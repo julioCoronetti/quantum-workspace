@@ -20,5 +20,18 @@ Rode o script principal:
 python3 script.py
 ```
 
+## Otimizador do VQC
+
+O otimizador do VQC pode ser configurado diretamente no `main()` do script
+principal, usando duas variaveis simples:
+
+```python
+optimizer_name = "SPSA"
+optimizer_options = {"maxiter": 30}
+```
+
+Troque `optimizer_name` para `COBYLA`, `SPSA`, `ADAM`, etc., e ajuste
+`optimizer_options` conforme os parametros aceitos pelo otimizador.
+
 Observação: o VQC (Qiskit) é usado quando disponível; se o Qiskit não estiver
 instalado ou compatível, o script executa apenas o classificador clássico.

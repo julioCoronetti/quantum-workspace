@@ -70,14 +70,38 @@ def train_classic(X_train: Any, y_train: Any, X_test: Any, y_test: Any) -> Tuple
     return model, acc, duration
 
 
-def create_vqc(X_train: Any, maxiter: int = 100) -> Tuple[Optional[Any], Optional[Exception]]:
+def create_optimizer(
+    optimizer_name: str, optimizer_options: Optional[Dict[str, Any]] = None
+) -> Tuple[Optional[Any], Optional[Exception]]:
+    """Cria e retorna um otimizador do Qiskit Algorithms pelo nome."""
+    try:
+        qalg = importlib.import_module("qiskit_algorithms.optimizers")
+    except Exception as e:
+        return None, e
+
+    name_norm = optimizer_name.strip().upper()
+    optimizer_class = getattr(qalg, name_norm, None)
+    if optimizer_class is None:
+        return None, ValueError(f"Otimizador nao encontrado: {optimizer_name}")
+
+    options = optimizer_options or {}
+    try:
+        return optimizer_class(**options), None
+    except Exception as e:
+        return None, e
+
+
+def create_vqc(
+    X_train: Any,
+    maxiter: int = 100,
+    optimizer_name: str = "COBYLA",
+    optimizer_options: Optional[Dict[str, Any]] = None,
+) -> Tuple[Optional[Any], Optional[Exception]]:
     """Cria uma instância do VQC (não treinada). Retorna (modelo, erro)."""
     try:
         qclib = importlib.import_module("qiskit.circuit.library")
         ZZFeatureMap = getattr(qclib, "ZZFeatureMap")
         RealAmplitudes = getattr(qclib, "RealAmplitudes")
-        qalg = importlib.import_module("qiskit_algorithms.optimizers")
-        COBYLA = getattr(qalg, "COBYLA")
         qml = importlib.import_module("qiskit_machine_learning.algorithms")
         VQC = getattr(qml, "VQC")
     except Exception as e:
@@ -93,7 +117,13 @@ def create_vqc(X_train: Any, maxiter: int = 100) -> Tuple[Optional[Any], Optiona
     num_features = X_train.shape[1]
     feature_map = ZZFeatureMap(feature_dimension=num_features, reps=1)
     ansatz = RealAmplitudes(num_qubits=num_features, reps=1)
-    optimizer = COBYLA(maxiter=maxiter)
+    optimizer_params = {"maxiter": maxiter}
+    if optimizer_options:
+        optimizer_params.update(optimizer_options)
+
+    optimizer, opt_err = create_optimizer(optimizer_name, optimizer_params)
+    if optimizer is None:
+        return None, opt_err
     vqc_kwargs = dict(feature_map=feature_map, ansatz=ansatz, optimizer=optimizer)
 
     # Tentar configurar um `sampler` (primitive novo) quando disponível
@@ -135,10 +165,21 @@ def create_vqc(X_train: Any, maxiter: int = 100) -> Tuple[Optional[Any], Optiona
 
 
 def train_quantum(
-    X_train: Any, y_train: Any, X_test: Any, y_test: Any, maxiter: int = 30
+    X_train: Any,
+    y_train: Any,
+    X_test: Any,
+    y_test: Any,
+    maxiter: int = 100,
+    optimizer_name: str = "SPSA",
+    optimizer_options: Optional[Dict[str, Any]] = None,
 ) -> Tuple[Optional[Any], Optional[float], Optional[float], Optional[Exception]]:
     """Cria o VQC e treina; retorna (modelo, acurácia, tempo, erro)."""
-    model_q, creation_err = create_vqc(X_train, maxiter=maxiter)
+    model_q, creation_err = create_vqc(
+        X_train,
+        maxiter=maxiter,
+        optimizer_name=optimizer_name,
+        optimizer_options=optimizer_options,
+    )
     if model_q is None:
         return None, None, None, creation_err
 
@@ -157,9 +198,13 @@ def print_results(
     time_classic: float,
     acc_quantum: Optional[float],
     time_quantum: Optional[float],
+    maxiter: int,
+    optimizer_name: str,
     quantum_error: Optional[Exception] = None,
 ) -> None:
-    print
+    print("## PARAMETROS")
+    print(f" - Maxiter: {maxiter}")
+    print(f" - Otimizador: {optimizer_name}\n")
     print("## RESULTADOS DA FASE 1")
     print("Modelo Clássico (SVM):")
     print(f" - Acurácia: {acc_classic * 100:.2f}%")
@@ -177,14 +222,31 @@ def print_results(
 
 
 def main(n_samples: int = 60, n_components: int = 2) -> None:
+    optimizer_name = "SPSA"
+    optimizer_options: Dict[str, Any] = {"maxiter": 30}
+    maxiter = optimizer_options.get("maxiter", 30)
     X_train, X_test, y_train, y_test = load_and_preprocess(
         n_samples=n_samples, n_components=n_components
     )
     _, acc_classic, time_classic = train_classic(X_train, y_train, X_test, y_test)
     _, acc_quantum, time_quantum, q_err = train_quantum(
-        X_train, y_train, X_test, y_test
+        X_train,
+        y_train,
+        X_test,
+        y_test,
+        maxiter=maxiter,
+        optimizer_name=optimizer_name,
+        optimizer_options=optimizer_options,
     )
-    print_results(acc_classic, time_classic, acc_quantum, time_quantum, q_err)
+    print_results(
+        acc_classic,
+        time_classic,
+        acc_quantum,
+        time_quantum,
+        maxiter,
+        optimizer_name,
+        q_err,
+    )
 
 
 if __name__ == "__main__":
