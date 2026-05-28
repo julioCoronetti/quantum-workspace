@@ -169,7 +169,7 @@ def train_quantum(
     y_train: Any,
     X_test: Any,
     y_test: Any,
-    maxiter: int = 100,
+    maxiter: int = 30,
     optimizer_name: str = "SPSA",
     optimizer_options: Optional[Dict[str, Any]] = None,
 ) -> Tuple[Optional[Any], Optional[float], Optional[float], Optional[Exception]]:
