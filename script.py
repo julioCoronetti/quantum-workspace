@@ -9,7 +9,7 @@ from sklearn.decomposition import PCA
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 
-DEFAULT_OPTIMIZER = "SPSA"
+DEFAULT_OPTIMIZER = "COBYLA"
 DEFAULT_MAXITER = 30
 FASE = 1
 
