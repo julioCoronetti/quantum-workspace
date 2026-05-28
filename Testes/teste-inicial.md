@@ -1,6 +1,4 @@
-==============================
-RESULTADOS DO TESTE INICIAL
-==============================
+## RESULTADOS DO TESTE INICIAL
 Modelo Clássico (SVM):
  - Acurácia: 94.44%
  - Tempo de treino: 0.0112 segundos
