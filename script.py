@@ -9,6 +9,9 @@ from sklearn.decomposition import PCA
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 
+DEFAULT_OPTIMIZER = "SPSA"
+DEFAULT_MAXITER = 30
+FASE = 1
 
 def get_qiskit_primitives() -> Dict[str, Any]:
     """Detecta dinamicamente primitives do Qiskit quando disponíveis."""
@@ -93,8 +96,8 @@ def create_optimizer(
 
 def create_vqc(
     X_train: Any,
-    maxiter: int = 100,
-    optimizer_name: str = "COBYLA",
+    maxiter: int = DEFAULT_MAXITER,
+    optimizer_name: str = DEFAULT_OPTIMIZER,
     optimizer_options: Optional[Dict[str, Any]] = None,
 ) -> Tuple[Optional[Any], Optional[Exception]]:
     """Cria uma instância do VQC (não treinada). Retorna (modelo, erro)."""
@@ -169,8 +172,8 @@ def train_quantum(
     y_train: Any,
     X_test: Any,
     y_test: Any,
-    maxiter: int = 30,
-    optimizer_name: str = "SPSA",
+    maxiter: int = DEFAULT_MAXITER,
+    optimizer_name: str = DEFAULT_OPTIMIZER,
     optimizer_options: Optional[Dict[str, Any]] = None,
 ) -> Tuple[Optional[Any], Optional[float], Optional[float], Optional[Exception]]:
     """Cria o VQC e treina; retorna (modelo, acurácia, tempo, erro)."""
@@ -205,7 +208,7 @@ def print_results(
     print("## PARAMETROS")
     print(f" - Maxiter: {maxiter}")
     print(f" - Otimizador: {optimizer_name}\n")
-    print("## RESULTADOS DA FASE 1")
+    print(f"## RESULTADOS DA FASE {FASE}")
     print("Modelo Clássico (SVM):")
     print(f" - Acurácia: {acc_classic * 100:.2f}%")
     print(f" - Tempo de treino: {time_classic:.4f} segundos\n")
@@ -222,9 +225,9 @@ def print_results(
 
 
 def main(n_samples: int = 60, n_components: int = 2) -> None:
-    optimizer_name = "SPSA"
-    optimizer_options: Dict[str, Any] = {"maxiter": 30}
-    maxiter = optimizer_options.get("maxiter", 30)
+    optimizer_name = DEFAULT_OPTIMIZER
+    optimizer_options: Dict[str, Any] = {"maxiter": DEFAULT_MAXITER}
+    maxiter = optimizer_options.get("maxiter", DEFAULT_MAXITER)
     X_train, X_test, y_train, y_test = load_and_preprocess(
         n_samples=n_samples, n_components=n_components
     )
