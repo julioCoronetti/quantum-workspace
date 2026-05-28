@@ -9,8 +9,8 @@ from sklearn.decomposition import PCA
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 
-DEFAULT_OPTIMIZER = "COBYLA"
-DEFAULT_MAXITER = 30
+DEFAULT_OPTIMIZER = "SPSA"
+DEFAULT_MAXITER = 100
 FASE = 1
 
 def get_qiskit_primitives() -> Dict[str, Any]:

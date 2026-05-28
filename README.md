@@ -26,7 +26,7 @@ O otimizador do VQC pode ser configurado diretamente no `main()` do script
 principal, usando duas variaveis simples:
 
 ```python
-optimizer_name = "SPSA"
+optimizer_name = "COBYLA"
 optimizer_options = {"maxiter": 30}
 ```
 
