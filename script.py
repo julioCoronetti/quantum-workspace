@@ -1,129 +1,192 @@
 import time
 import importlib
 from inspect import signature
+from typing import Any, Dict, Optional, Tuple
+
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 
-# Bibliotecas do Qiskit
-from qiskit.circuit.library import ZZFeatureMap, RealAmplitudes
-from qiskit_algorithms.optimizers import COBYLA
-from qiskit_machine_learning.algorithms import VQC
 
-# Compatibilidade com diferentes versões do Qiskit:
-# - Tenta importar a primitive `Sampler` (versões mais novas)
-# - Se não disponível, tentamos opções de fallback dinamicamente
-Sampler = None
-_HAS_SAMPLER_PRIMITIVE = False
-try:
-    primitives_mod = importlib.import_module("qiskit.primitives")
-    Sampler = getattr(primitives_mod, "Sampler", None)
-    _HAS_SAMPLER_PRIMITIVE = Sampler is not None
-except Exception:
+def get_qiskit_primitives() -> Dict[str, Any]:
+    """Detecta dinamicamente primitives do Qiskit quando disponíveis."""
     Sampler = None
     _HAS_SAMPLER_PRIMITIVE = False
+    try:
+        primitives_mod = importlib.import_module("qiskit.primitives")
+        Sampler = getattr(primitives_mod, "Sampler", None)
+        _HAS_SAMPLER_PRIMITIVE = Sampler is not None
+    except Exception:
+        Sampler = None
+        _HAS_SAMPLER_PRIMITIVE = False
 
-QuantumInstance = None
-AerSimulator = None
-_HAS_AER = False
-try:
-    qiskit_utils = importlib.import_module("qiskit.utils")
-    QuantumInstance = getattr(qiskit_utils, "QuantumInstance", None)
-    aer_mod = importlib.import_module("qiskit.providers.aer")
-    AerSimulator = getattr(aer_mod, "AerSimulator", None)
-    _HAS_AER = AerSimulator is not None
-except Exception:
     QuantumInstance = None
     AerSimulator = None
     _HAS_AER = False
-
-# 1. Dados (Drasticamente reduzidos para não travar sua CPU)
-data = load_breast_cancer()
-X = data.data[:60]  # Pegando apenas 60 amostras
-y = data.target[:60]
-
-# PCA para reduzir a apenas 2 variáveis (features)
-pca = PCA(n_components=2)
-X_pca = pca.fit_transform(X)
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X_pca, y, test_size=0.3, random_state=42
-)
-
-# 2. Modelo Clássico (Baseline para comparação)
-inicio_classico = time.time()
-modelo_classico = SVC(kernel="linear")
-modelo_classico.fit(X_train, y_train)
-tempo_classico = time.time() - inicio_classico
-
-acc_classico = accuracy_score(y_test, modelo_classico.predict(X_test))
-
-# 3. Modelo Quântico (Simulado)
-# Usamos o VQC (Classificador Quântico Variacional).
-# Na próxima etapa da IC, você substituirá o 'ansatz' padrão pela formulação exata do QAOA.
-num_features = X_train.shape[1]
-feature_map = ZZFeatureMap(feature_dimension=num_features, reps=1)
-ansatz = RealAmplitudes(
-    num_qubits=num_features, reps=1
-)  # Onde o QAOA vai entrar depois
-otimizador = COBYLA(maxiter=30)  # Apenas 30 iterações para rodar rápido
-vqc_kwargs = dict(feature_map=feature_map, ansatz=ansatz, optimizer=otimizador)
-
-# Tentar configurar um `sampler` (novo primitive) quando disponível
-if _HAS_SAMPLER_PRIMITIVE:
     try:
-        sampler = Sampler()
-        vqc_kwargs["sampler"] = sampler
+        qiskit_utils = importlib.import_module("qiskit.utils")
+        QuantumInstance = getattr(qiskit_utils, "QuantumInstance", None)
+        aer_mod = importlib.import_module("qiskit.providers.aer")
+        AerSimulator = getattr(aer_mod, "AerSimulator", None)
+        _HAS_AER = AerSimulator is not None
     except Exception:
-        # tenta criar um BackendSampler com Aer se possível
+        QuantumInstance = None
+        AerSimulator = None
+        _HAS_AER = False
+
+    return {
+        "Sampler": Sampler,
+        "QuantumInstance": QuantumInstance,
+        "AerSimulator": AerSimulator,
+        "_HAS_SAMPLER_PRIMITIVE": _HAS_SAMPLER_PRIMITIVE,
+        "_HAS_AER": _HAS_AER,
+    }
+
+
+def load_and_preprocess(
+    n_samples: int = 60, n_components: int = 2, test_size: float = 0.3, random_state: int = 42
+) -> Tuple[Any, Any, Any, Any]:
+    """Carrega dataset e aplica PCA + split."""
+    data = load_breast_cancer()
+    X = data.data[:n_samples]
+    y = data.target[:n_samples]
+    pca = PCA(n_components=n_components)
+    X_pca = pca.fit_transform(X)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X_pca, y, test_size=test_size, random_state=random_state
+    )
+    return X_train, X_test, y_train, y_test
+
+
+def train_classic(X_train: Any, y_train: Any, X_test: Any, y_test: Any) -> Tuple[Any, float, float]:
+    """Treina um SVM linear e retorna (modelo, acurácia, tempo)."""
+    start = time.time()
+    model = SVC(kernel="linear")
+    model.fit(X_train, y_train)
+    duration = time.time() - start
+    acc = accuracy_score(y_test, model.predict(X_test))
+    return model, acc, duration
+
+
+def create_vqc(X_train: Any, maxiter: int = 30) -> Tuple[Optional[Any], Optional[Exception]]:
+    """Cria uma instância do VQC (não treinada). Retorna (modelo, erro)."""
+    try:
+        qclib = importlib.import_module("qiskit.circuit.library")
+        ZZFeatureMap = getattr(qclib, "ZZFeatureMap")
+        RealAmplitudes = getattr(qclib, "RealAmplitudes")
+        qalg = importlib.import_module("qiskit_algorithms.optimizers")
+        COBYLA = getattr(qalg, "COBYLA")
+        qml = importlib.import_module("qiskit_machine_learning.algorithms")
+        VQC = getattr(qml, "VQC")
+    except Exception as e:
+        return None, e
+
+    primitives = get_qiskit_primitives()
+    Sampler = primitives["Sampler"]
+    QuantumInstance = primitives["QuantumInstance"]
+    AerSimulator = primitives["AerSimulator"]
+    _HAS_SAMPLER_PRIMITIVE = primitives["_HAS_SAMPLER_PRIMITIVE"]
+    _HAS_AER = primitives["_HAS_AER"]
+
+    num_features = X_train.shape[1]
+    feature_map = ZZFeatureMap(feature_dimension=num_features, reps=1)
+    ansatz = RealAmplitudes(num_qubits=num_features, reps=1)
+    optimizer = COBYLA(maxiter=maxiter)
+    vqc_kwargs = dict(feature_map=feature_map, ansatz=ansatz, optimizer=optimizer)
+
+    # Tentar configurar um `sampler` (primitive novo) quando disponível
+    if _HAS_SAMPLER_PRIMITIVE and Sampler is not None:
         try:
-            primitives_mod = importlib.import_module("qiskit.primitives")
-            BackendSampler = getattr(primitives_mod, "BackendSampler", None)
-            if _HAS_AER and BackendSampler is not None:
-                backend = AerSimulator()
-                sampler = BackendSampler(backend=backend)
-                vqc_kwargs["sampler"] = sampler
+            sampler = Sampler()
+            vqc_kwargs["sampler"] = sampler
         except Exception:
-            pass
+            try:
+                primitives_mod = importlib.import_module("qiskit.primitives")
+                BackendSampler = getattr(primitives_mod, "BackendSampler", None)
+                if _HAS_AER and BackendSampler is not None:
+                    backend = AerSimulator()
+                    sampler = BackendSampler(backend=backend)
+                    vqc_kwargs["sampler"] = sampler
+            except Exception:
+                pass
 
-# Algumas versões antigas do VQC esperam `quantum_instance` em vez de `sampler`
+    # Algumas versões antigas do VQC esperam `quantum_instance` em vez de `sampler`
+    try:
+        sig = signature(VQC.__init__)
+        params = sig.parameters
+    except Exception:
+        params = {}
 
-sig = signature(VQC.__init__)
-params = sig.parameters
-if "quantum_instance" in params and "quantum_instance" not in vqc_kwargs:
-    if _HAS_AER and QuantumInstance is not None:
-        try:
-            qi = QuantumInstance(AerSimulator())
-            vqc_kwargs["quantum_instance"] = qi
-        except Exception:
-            pass
+    if "quantum_instance" in params and "quantum_instance" not in vqc_kwargs:
+        if _HAS_AER and QuantumInstance is not None:
+            try:
+                qi = QuantumInstance(AerSimulator())
+                vqc_kwargs["quantum_instance"] = qi
+            except Exception:
+                pass
 
-modelo_quantico = None
-acc_quantico = None
-tempo_quantico = None
-try:
-    modelo_quantico = VQC(**vqc_kwargs)
-    inicio_quantico = time.time()
-    modelo_quantico.fit(X_train, y_train)
-    tempo_quantico = time.time() - inicio_quantico
-    acc_quantico = accuracy_score(y_test, modelo_quantico.predict(X_test))
-except Exception as e:
-    print("Aviso: não foi possível executar o VQC (compatibilidade/execução).")
-    print("Erro:", e)
+    try:
+        model_q = VQC(**vqc_kwargs)
+        return model_q, None
+    except Exception as e:
+        return None, e
 
-# 4. Saída para a sua Tabela da Reunião
-print("\n" + "=" * 30)
-print("RESULTADOS DO TESTE INICIAL")
-print("=" * 30)
-print("Modelo Clássico (SVM):")
-print(f" - Acurácia: {acc_classico * 100:.2f}%")
-print(f" - Tempo de treino: {tempo_classico:.4f} segundos\n")
-print("Modelo Quântico (VQC Simulado):")
-if acc_quantico is None:
-    print(" - Acurácia: N/A (VQC não executado)")
-    print(" - Tempo de treino: N/A")
-else:
-    print(f" - Acurácia: {acc_quantico * 100:.2f}%")
-    print(f" - Tempo de treino: {tempo_quantico:.4f} segundos")
+
+def train_quantum(
+    X_train: Any, y_train: Any, X_test: Any, y_test: Any, maxiter: int = 30
+) -> Tuple[Optional[Any], Optional[float], Optional[float], Optional[Exception]]:
+    """Cria o VQC e treina; retorna (modelo, acurácia, tempo, erro)."""
+    model_q, creation_err = create_vqc(X_train, maxiter=maxiter)
+    if model_q is None:
+        return None, None, None, creation_err
+
+    try:
+        start = time.time()
+        model_q.fit(X_train, y_train)
+        duration_q = time.time() - start
+        acc_q = accuracy_score(y_test, model_q.predict(X_test))
+        return model_q, acc_q, duration_q, None
+    except Exception as e:
+        return None, None, None, e
+
+
+def print_results(
+    acc_classic: float,
+    time_classic: float,
+    acc_quantum: Optional[float],
+    time_quantum: Optional[float],
+    quantum_error: Optional[Exception] = None,
+) -> None:
+    print("\n" + "=" * 30)
+    print("RESULTADOS DO TESTE INICIAL")
+    print("=" * 30)
+    print("Modelo Clássico (SVM):")
+    print(f" - Acurácia: {acc_classic * 100:.2f}%")
+    print(f" - Tempo de treino: {time_classic:.4f} segundos\n")
+    print("Modelo Quântico (VQC Simulado):")
+    if acc_quantum is None:
+        print(" - Acurácia: N/A (VQC não executado)")
+        print(" - Tempo de treino: N/A")
+        if quantum_error is not None:
+            print("Aviso: não foi possível executar o VQC (compatibilidade/execução).")
+            print("Erro:", quantum_error)
+    else:
+        print(f" - Acurácia: {acc_quantum * 100:.2f}%")
+        print(f" - Tempo de treino: {time_quantum:.4f} segundos")
+
+
+def main(n_samples: int = 60, n_components: int = 2) -> None:
+    X_train, X_test, y_train, y_test = load_and_preprocess(
+        n_samples=n_samples, n_components=n_components
+    )
+    _, acc_classic, time_classic = train_classic(X_train, y_train, X_test, y_test)
+    _, acc_quantum, time_quantum, q_err = train_quantum(
+        X_train, y_train, X_test, y_test
+    )
+    print_results(acc_classic, time_classic, acc_quantum, time_quantum, q_err)
+
+
+if __name__ == "__main__":
+    main()
