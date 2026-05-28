@@ -70,7 +70,7 @@ def train_classic(X_train: Any, y_train: Any, X_test: Any, y_test: Any) -> Tuple
     return model, acc, duration
 
 
-def create_vqc(X_train: Any, maxiter: int = 30) -> Tuple[Optional[Any], Optional[Exception]]:
+def create_vqc(X_train: Any, maxiter: int = 100) -> Tuple[Optional[Any], Optional[Exception]]:
     """Cria uma instância do VQC (não treinada). Retorna (modelo, erro)."""
     try:
         qclib = importlib.import_module("qiskit.circuit.library")
@@ -159,9 +159,8 @@ def print_results(
     time_quantum: Optional[float],
     quantum_error: Optional[Exception] = None,
 ) -> None:
-    print("\n" + "=" * 30)
-    print("RESULTADOS DO TESTE INICIAL")
-    print("=" * 30)
+    print
+    print("## RESULTADOS DA FASE 1")
     print("Modelo Clássico (SVM):")
     print(f" - Acurácia: {acc_classic * 100:.2f}%")
     print(f" - Tempo de treino: {time_classic:.4f} segundos\n")
