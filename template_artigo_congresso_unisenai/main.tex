@@ -1,0 +1,111 @@
+\documentclass[12pt]{unisenaiclass}
+\usepackage{unisenaistyle}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{caption}
+
+\usepackage{csquotes} % Recomendado com biblatex
+\usepackage[backend=biber, style=abnt]{biblatex} % ou 'style=apa', 'numeric', etc.
+\addbibresource{referencias.bib} % arquivo .bib com as referências
+
+\title{TÍTULO DO ARTIGO}
+\subtitle{ARTICLE TITLE}
+
+\author{
+    \textbf{Nome do Autor 1} \thanks{Instituição e e-mail do Autor 1.},\\
+    \textbf{Nome do Autor 2} \thanks{Instituição e e-mail do Autor 2.},\\
+    \textbf{Nome do Autor 3} \thanks{Instituição e e-mail do Autor 3.}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{resumo}
+O resumo deve apresentar uma visão geral do trabalho, destacando objetivo, metodologia, resultados e conclusões. Deve ter no máximo 250 palavras e ser escrito em português.
+\end{resumo}
+
+\begin{justify}
+    \textbf{Palavras-chave:} palavra1; palavra2; palavra3.
+\end{justify}
+
+\begin{abstract1}
+This is the abstract of the paper, written in English. It must summarize the work including objectives, methodology, results, and conclusions. Maximum 250 words.
+\end{abstract1}
+
+\begin{justify}
+    \textbf{Keywords:} keyword1; keyword2; keyword3.    
+\end{justify}
+
+\newpage
+
+\section{Introdução}
+A introdução deve contextualizar o tema, apresentar o problema de pesquisa, justificar o estudo e mencionar os objetivos. Também pode apresentar a estrutura do artigo.
+
+\section{Revisão de Literatura}
+Aqui você apresenta o embasamento teórico necessário. O uso de citações nesta secção é mandatório.
+
+As citações são recursos fundamentais em trabalhos científicos, pois permitem embasar argumentos com base em autores reconhecidos. Existem dois tipos principais: citação direta e citação indireta.
+
+A citação direta consiste na transcrição literal das palavras do autor consultado. Ela deve ser usada entre aspas quando tiver até três linhas ou em bloco recuado, sem aspas, quando for mais extensa. Por exemplo: segundo \textcite{knuth1984tex}, "TeX é um novo sistema de composição tipográfica destinado à criação de livros bonitos".
+
+\begin{itemize}
+    \item \textbf{Exemplo de citação direta longa:}
+\end{itemize}
+
+Segundo \textcite{freire1996pedagogia}, a educação deve ser pensada de maneira crítica e libertadora. O autor afirma:
+
+\begin{quote}
+    Ensinar não é transferir conhecimento, mas criar as possibilidades para a sua própria produção ou a sua construção. Quem ensina aprende ao ensinar e quem aprende ensina ao aprender. Não há ensino sem pesquisa e pesquisa sem ensino. Esses quehaceres se encontram um no corpo do outro. Enquanto ensino, continuo buscando, pesquisando. Ensino porque busco, porque indaguei, porque indago e me indago. Pesquiso para constatar, constatando intervenho, intervindo educo e me educo.
+\end{quote}
+
+Por outro lado, a citação indireta refere-se à reformulação das ideias do autor com as próprias palavras do estudante, sem copiar literalmente o texto. Mesmo assim, é obrigatório indicar a fonte. Por exemplo: O sistema TeX foi desenvolvido por Knuth com o objetivo de produzir livros com alta qualidade tipográfica \cite{knuth1984tex}.
+
+Ao final do documento, as referências serão listadas automaticamente.
+
+\section{Metodologia}
+Descreva os métodos, ferramentas e processos usados no desenvolvimento do trabalho.
+
+\subsection{Exemplo de Imagem}
+A Figura~\ref{fig:exemplo} mostra um exemplo de imagem.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{imgs/image.png}
+    \caption{Legenda da imagem conforme formatação do template.}
+    \label{fig:exemplo}
+\end{figure}
+
+
+
+\section{Resultados e Discussões}
+Apresente os resultados obtidos, discutindo sua relevância e implicações. Inclua gráficos ou tabelas se necessário.
+
+\subsection{Exemplo de Tabela}
+A Tabela~\ref{tab:exemplo} mostra como inserir uma tabela no formato exigido.
+
+\begin{table}[H]
+    \centering
+    \caption{Legenda da tabela conforme formatação do template.}
+    \label{tab:exemplo}
+    \begin{tabular}{|c|c|c|}
+        \hline
+        Coluna 1 & Coluna 2 & Coluna 3 \\ \hline
+        Dado A1  & Dado A2  & Dado A3  \\ \hline
+        Dado B1  & Dado B2  & Dado B3  \\ \hline
+    \end{tabular}
+\end{table}
+
+\section{Conclusão}
+Retome os objetivos, resuma os principais resultados e indique possíveis trabalhos futuros.
+
+\section*{Agradecimentos}
+Inclua agradecimentos a instituições, financiamentos ou orientadores.
+
+\printbibliography
+
+\end{document}

@@ -1,17 +1,32 @@
 import time
 import importlib
+import numpy as np
 from inspect import signature
 from typing import Any, Dict, Optional, Tuple
 
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 
 DEFAULT_OPTIMIZER = "SPSA"
 DEFAULT_MAXITER = 100
+DEFAULT_N_SAMPLES = 100
+DEFAULT_N_COMPONENTS = 2
 FASE = 1
+
+
+def set_qiskit_seed(random_state: int) -> None:
+    """Fixa a semente global do Qiskit Algorithms quando a versão oferece suporte."""
+    try:
+        utils_mod = importlib.import_module("qiskit_algorithms.utils")
+        algorithm_globals = getattr(utils_mod, "algorithm_globals", None)
+        if algorithm_globals is not None:
+            algorithm_globals.random_seed = random_state
+    except Exception:
+        pass
 
 def get_qiskit_primitives() -> Dict[str, Any]:
     """Detecta dinamicamente primitives do Qiskit quando disponíveis."""
@@ -49,17 +64,42 @@ def get_qiskit_primitives() -> Dict[str, Any]:
 
 
 def load_and_preprocess(
-    n_samples: int = 60, n_components: int = 2, test_size: float = 0.3, random_state: int = 42
+    n_samples: int = DEFAULT_N_SAMPLES,
+    n_components: int = DEFAULT_N_COMPONENTS,
+    test_size: float = 0.3,
+    random_state: int = 42,
 ) -> Tuple[Any, Any, Any, Any]:
-    """Carrega dataset e aplica PCA + split."""
+    """Carrega dataset, estratifica a amostra e aplica scaler + PCA sem vazamento."""
     data = load_breast_cancer()
-    X = data.data[:n_samples]
-    y = data.target[:n_samples]
-    pca = PCA(n_components=n_components)
-    X_pca = pca.fit_transform(X)
-    X_train, X_test, y_train, y_test = train_test_split(
-        X_pca, y, test_size=test_size, random_state=random_state
+    X = data.data
+    y = data.target
+
+    if n_samples is not None and n_samples < len(y):
+        X, _, y, _ = train_test_split(
+            X,
+            y,
+            train_size=n_samples,
+            stratify=y,
+            random_state=random_state,
+        )
+
+    X_train_raw, X_test_raw, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, stratify=y, random_state=random_state
     )
+
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train_raw)
+    X_test_scaled = scaler.transform(X_test_raw)
+
+    pca = PCA(n_components=n_components, random_state=random_state)
+    X_train_pca = pca.fit_transform(X_train_scaled)
+    X_test_pca = pca.transform(X_test_scaled)
+
+    # A escala 0..1 foi a mais estável nos testes da Fase 1 com ZZFeatureMap.
+    feature_scaler = MinMaxScaler(feature_range=(0, 1))
+    X_train = feature_scaler.fit_transform(X_train_pca)
+    X_test = feature_scaler.transform(X_test_pca)
+
     return X_train, X_test, y_train, y_test
 
 
@@ -99,16 +139,24 @@ def create_vqc(
     maxiter: int = DEFAULT_MAXITER,
     optimizer_name: str = DEFAULT_OPTIMIZER,
     optimizer_options: Optional[Dict[str, Any]] = None,
+    random_state: int = 42,
 ) -> Tuple[Optional[Any], Optional[Exception]]:
     """Cria uma instância do VQC (não treinada). Retorna (modelo, erro)."""
     try:
         qclib = importlib.import_module("qiskit.circuit.library")
-        ZZFeatureMap = getattr(qclib, "ZZFeatureMap")
-        RealAmplitudes = getattr(qclib, "RealAmplitudes")
+        zz_feature_map = getattr(qclib, "zz_feature_map", None)
+        real_amplitudes = getattr(qclib, "real_amplitudes", None)
+        ZZFeatureMap = getattr(qclib, "ZZFeatureMap", None)
+        RealAmplitudes = getattr(qclib, "RealAmplitudes", None)
         qml = importlib.import_module("qiskit_machine_learning.algorithms")
         VQC = getattr(qml, "VQC")
     except Exception as e:
         return None, e
+
+    if zz_feature_map is None and ZZFeatureMap is None:
+        return None, ImportError("ZZFeatureMap/zz_feature_map nao encontrado no Qiskit")
+    if real_amplitudes is None and RealAmplitudes is None:
+        return None, ImportError("RealAmplitudes/real_amplitudes nao encontrado no Qiskit")
 
     primitives = get_qiskit_primitives()
     Sampler = primitives["Sampler"]
@@ -117,9 +165,17 @@ def create_vqc(
     _HAS_SAMPLER_PRIMITIVE = primitives["_HAS_SAMPLER_PRIMITIVE"]
     _HAS_AER = primitives["_HAS_AER"]
 
+    set_qiskit_seed(random_state)
     num_features = X_train.shape[1]
-    feature_map = ZZFeatureMap(feature_dimension=num_features, reps=1)
-    ansatz = RealAmplitudes(num_qubits=num_features, reps=1)
+    if zz_feature_map is not None:
+        feature_map = zz_feature_map(feature_dimension=num_features, reps=1)
+    else:
+        feature_map = ZZFeatureMap(feature_dimension=num_features, reps=1)
+
+    if real_amplitudes is not None:
+        ansatz = real_amplitudes(num_qubits=num_features, reps=1)
+    else:
+        ansatz = RealAmplitudes(num_qubits=num_features, reps=1)
     optimizer_params = {"maxiter": maxiter}
     if optimizer_options:
         optimizer_params.update(optimizer_options)
@@ -127,7 +183,13 @@ def create_vqc(
     optimizer, opt_err = create_optimizer(optimizer_name, optimizer_params)
     if optimizer is None:
         return None, opt_err
-    vqc_kwargs = dict(feature_map=feature_map, ansatz=ansatz, optimizer=optimizer)
+    initial_point = np.full(ansatz.num_parameters, 0.1)
+    vqc_kwargs = dict(
+        feature_map=feature_map,
+        ansatz=ansatz,
+        optimizer=optimizer,
+        initial_point=initial_point,
+    )
 
     # Tentar configurar um `sampler` (primitive novo) quando disponível
     if _HAS_SAMPLER_PRIMITIVE and Sampler is not None:
@@ -175,6 +237,7 @@ def train_quantum(
     maxiter: int = DEFAULT_MAXITER,
     optimizer_name: str = DEFAULT_OPTIMIZER,
     optimizer_options: Optional[Dict[str, Any]] = None,
+    random_state: int = 42,
 ) -> Tuple[Optional[Any], Optional[float], Optional[float], Optional[Exception]]:
     """Cria o VQC e treina; retorna (modelo, acurácia, tempo, erro)."""
     model_q, creation_err = create_vqc(
@@ -182,6 +245,7 @@ def train_quantum(
         maxiter=maxiter,
         optimizer_name=optimizer_name,
         optimizer_options=optimizer_options,
+        random_state=random_state,
     )
     if model_q is None:
         return None, None, None, creation_err
@@ -203,9 +267,13 @@ def print_results(
     time_quantum: Optional[float],
     maxiter: int,
     optimizer_name: str,
+    n_samples: int,
+    n_components: int,
     quantum_error: Optional[Exception] = None,
 ) -> None:
     print("## PARAMETROS")
+    print(f" - Amostras: {n_samples}")
+    print(f" - Componentes PCA: {n_components}")
     print(f" - Maxiter: {maxiter}")
     print(f" - Otimizador: {optimizer_name}\n")
     print(f"## RESULTADOS DA FASE {FASE}")
@@ -224,12 +292,16 @@ def print_results(
         print(f" - Tempo de treino: {time_quantum:.4f} segundos")
 
 
-def main(n_samples: int = 60, n_components: int = 2) -> None:
+def main(
+    n_samples: int = DEFAULT_N_SAMPLES,
+    n_components: int = DEFAULT_N_COMPONENTS,
+    random_state: int = 42,
+) -> None:
     optimizer_name = DEFAULT_OPTIMIZER
     optimizer_options: Dict[str, Any] = {"maxiter": DEFAULT_MAXITER}
     maxiter = optimizer_options.get("maxiter", DEFAULT_MAXITER)
     X_train, X_test, y_train, y_test = load_and_preprocess(
-        n_samples=n_samples, n_components=n_components
+        n_samples=n_samples, n_components=n_components, random_state=random_state
     )
     _, acc_classic, time_classic = train_classic(X_train, y_train, X_test, y_test)
     _, acc_quantum, time_quantum, q_err = train_quantum(
@@ -240,6 +312,7 @@ def main(n_samples: int = 60, n_components: int = 2) -> None:
         maxiter=maxiter,
         optimizer_name=optimizer_name,
         optimizer_options=optimizer_options,
+        random_state=random_state,
     )
     print_results(
         acc_classic,
@@ -248,6 +321,8 @@ def main(n_samples: int = 60, n_components: int = 2) -> None:
         time_quantum,
         maxiter,
         optimizer_name,
+        n_samples,
+        n_components,
         q_err,
     )
 

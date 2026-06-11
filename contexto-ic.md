@@ -57,15 +57,20 @@ A conversão de problemas de classificação supervisionada para formulações Q
 
 #### Fase 1: Estabilizando o Modelo Base
 
+**Status:** Concluída em 2026-06-11 para o baseline VQC simulado. A configuração estabilizada usa 100 amostras estratificadas, PCA com 2 componentes, escala `0..1`, otimizador SPSA e `maxiter=100`.
+
 **Objetivo Prático:** Fazer a acurácia quântica subir de 44% para mais de 80%, estabilizando o aprendizado do modelo.
 
 - **Pesquisa:** Entender a diferença entre os otimizadores clássicos do Qiskit, focando no motivo pelo qual o SPSA lida melhor com ruídos do que o COBYLA.
 - **Experimento:** No script inicial, aumentar o `maxiter` de 30 para 100 ou 200 e trocar o otimizador para SPSA.
+- **Resultado validado:** O script principal atingiu 83,33% de acurácia no VQC simulado e 100,00% no SVM clássico. O registro completo está em `testes/teste-03.md`.
 - **Buscas no EBSCO (Justificativa Teórica):** Encontrar artigos que justifiquem a troca para um otimizador mais robusto no ambiente quântico.
     - `"Quantum Machine Learning" AND ("SPSA" OR "COBYLA") AND "optimizer"`
     - `"Variational Quantum Classifier" AND "noise" AND "SPSA"`
 
 #### Fase 2: O Coração da IC (Implementando o QAOA)
+
+**Status:** Próxima fase.
 
 **Objetivo Prático:** Traduzir a classificação em otimização. O QAOA não roda classificação nativamente; ele precisa ler o problema matematicamente de outra forma.
 
