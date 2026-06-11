@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="560" viewBox="0 0 920 560">
+<rect width="100%" height="100%" fill="white"/>
+<text x="460.0" y="35" text-anchor="middle" font-family="Arial" font-size="24" font-weight="700">Tempo do QUBO exato por PCA</text>
+<line x1="90" y1="460" x2="820" y2="460" stroke="#222" stroke-width="2"/>
+<line x1="90" y1="460" x2="90" y2="70" stroke="#222" stroke-width="2"/>
+<line x1="90.0" y1="460" x2="90.0" y2="468" stroke="#222"/>
+<text x="90.0" y="492" text-anchor="middle" font-family="Arial" font-size="15">2</text>
+<line x1="333.3" y1="460" x2="333.3" y2="468" stroke="#222"/>
+<text x="333.3" y="492" text-anchor="middle" font-family="Arial" font-size="15">3</text>
+<line x1="576.7" y1="460" x2="576.7" y2="468" stroke="#222"/>
+<text x="576.7" y="492" text-anchor="middle" font-family="Arial" font-size="15">4</text>
+<line x1="820.0" y1="460" x2="820.0" y2="468" stroke="#222"/>
+<text x="820.0" y="492" text-anchor="middle" font-family="Arial" font-size="15">5</text>
+<line x1="84" y1="460.0" x2="820" y2="460.0" stroke="#e6e6e6"/>
+<text x="78" y="465.0" text-anchor="end" font-family="Arial" font-size="14">0</text>
+<line x1="84" y1="362.5" x2="820" y2="362.5" stroke="#e6e6e6"/>
+<text x="78" y="367.5" text-anchor="end" font-family="Arial" font-size="14">2</text>
+<line x1="84" y1="265.0" x2="820" y2="265.0" stroke="#e6e6e6"/>
+<text x="78" y="270.0" text-anchor="end" font-family="Arial" font-size="14">4</text>
+<line x1="84" y1="167.5" x2="820" y2="167.5" stroke="#e6e6e6"/>
+<text x="78" y="172.5" text-anchor="end" font-family="Arial" font-size="14">6</text>
+<line x1="84" y1="70.0" x2="820" y2="70.0" stroke="#e6e6e6"/>
+<text x="78" y="75.0" text-anchor="end" font-family="Arial" font-size="14">8</text>
+<text x="455.0" y="532" text-anchor="middle" font-family="Arial" font-size="16">Componentes PCA</text>
+<text x="28" y="265.0" transform="rotate(-90 28 265.0)" text-anchor="middle" font-family="Arial" font-size="16">Tempo (s)</text>
+<polyline points="90.0,456.0 333.3,437.7 576.7,398.7 820.0,111.5" fill="none" stroke="#1f77b4" stroke-width="3"/>
+<circle cx="90.0" cy="456.0" r="5" fill="#1f77b4"/>
+<circle cx="333.3" cy="437.7" r="5" fill="#1f77b4"/>
+<circle cx="576.7" cy="398.7" r="5" fill="#1f77b4"/>
+<circle cx="820.0" cy="111.5" r="5" fill="#1f77b4"/>
+<rect x="90" y="500" width="18" height="18" fill="#1f77b4"/>
+<text x="116" y="514" font-family="Arial" font-size="15">QUBO exato</text>
+</svg>

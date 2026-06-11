@@ -15,6 +15,9 @@
 | `resultados/resultados_qaoa_pca_2.csv` | QAOA PCA=2 | Resultado QAOA principal pequeno |
 | `resultados/resultados_qaoa_pca_3.csv` | QAOA PCA=3 | Discussão de custo |
 | `resultados/resultados_qaoa_pca_4.csv` | QAOA PCA=4 exploratório | Discussão de limitação computacional |
+| `resultados/grafico_acuracia_pca.svg` | Gráfico de acurácia por PCA | Figura preliminar |
+| `resultados/grafico_tempo_qubo_exato_pca.svg` | Gráfico de tempo do QUBO exato por PCA | Figura preliminar |
+| `resultados/grafico_tempo_qaoa_pca.svg` | Gráfico de tempo QAOA por PCA em escala log | Figura preliminar |
 
 ## Tabelas planejadas
 
@@ -69,27 +72,24 @@ Status: desenhar depois que a Fase 2 estiver implementada.
 
 ### Figura 2 - Acuracia por PCA
 
-Fonte esperada:
+Fonte:
 
 - `resultados/resultados_qaoa_pca.csv`
 - `resultados/resultados_qubo_exato_pca.csv`
 
-Status: pendente de geração.
+Status: gerado em `resultados/grafico_acuracia_pca.svg`.
 
 ### Figura 3 - Tempo por PCA
 
-Fonte esperada:
+Fonte:
 
 - `resultados/resultados_qaoa_pca.csv`
 - `resultados/resultados_qubo_exato_pca.csv`
 
-Status: pendente de geração.
+Status: gerado em `resultados/grafico_tempo_qubo_exato_pca.svg` e `resultados/grafico_tempo_qaoa_pca.svg`.
 
-## Arquivos a gerar futuramente
+## Arquivos ainda desejáveis futuramente
 
-- `resultados/resultados_qaoa_pca.csv`
 - `resultados/grafico_acuracia_pca.png`
 - `resultados/grafico_tempo_pca.png`
-- `testes/teste-04-qubo.md`
-- `testes/teste-05-qaoa-inicial.md`
-- `testes/teste-06-pipeline-estresse.md`
+- `resultados/grafico_tempo_qaoa_pca.png`
