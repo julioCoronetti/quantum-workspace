@@ -1,0 +1,3 @@
+fase,n_samples,n_components,n_train,n_test,qaoa_reps,bits_per_sign,coefficient_scale,regularization,mutual_exclusion,modelo,otimizador,maxiter,n_binary_variables,accuracy,train_time_seconds,objective_value,status,observacoes
+2,100,2,70,30,1,1,2.0,0.05,0.25,SVM linear,,,0,1.0,0.0010335445404052734,,SUCCESS,Baseline classico no mesmo split.
+2,100,2,70,30,1,1,2.0,0.05,0.25,QAOA-QUBO linear,COBYLA,40,6,0.9,1.782926082611084,0.8735746426541315,SUCCESS,QUBO de classificador linear discretizado com perda quadratica de margem.
