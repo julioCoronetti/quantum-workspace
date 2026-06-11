@@ -18,11 +18,12 @@
 ## Experimentos
 
 - [x] Baseline classico SVM e VQC simulado da Fase 1.
-- [ ] Implementar formulacao QUBO para o problema de classificacao.
-- [ ] Implementar pipeline QAOA/Qiskit Optimization.
-- [ ] Executar comparacao SVM classico vs. abordagem QAOA/QUBO.
-- [ ] Executar variacao de PCA com 2, 3, 4 e 5 componentes.
-- [ ] Salvar resultados finais em CSV.
+- [x] Implementar formulacao QUBO para o problema de classificacao.
+- [x] Implementar pipeline QAOA/Qiskit Optimization.
+- [x] Executar comparacao SVM classico vs. abordagem QAOA/QUBO.
+- [x] Executar variacao preliminar de PCA com 2, 3, 4 e 5 componentes usando QUBO exato.
+- [ ] Definir quais resultados serao tratados como finais no artigo.
+- [x] Salvar resultados preliminares em CSV.
 - [ ] Gerar graficos para tempo e acuracia.
 
 ## Escrita

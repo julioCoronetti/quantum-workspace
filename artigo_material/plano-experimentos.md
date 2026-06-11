@@ -34,13 +34,15 @@ Resultado registrado:
 
 ## Fase 2 - QUBO/QAOA
 
+Status: implementacao preliminar concluida.
+
 Objetivo: transformar o problema de classificacao em uma formulacao QUBO e resolver por QAOA simulado.
 
 Entregaveis sugeridos:
 
-- `script_qaoa.py`: implementacao separada para nao quebrar o baseline da Fase 1.
-- `testes/teste-04-qubo.md`: registro da formulacao QUBO escolhida.
-- `testes/teste-05-qaoa-inicial.md`: primeira execucao QAOA.
+- `script_qaoa.py`: implementacao separada para nao quebrar o baseline da Fase 1. Status: concluido.
+- `testes/teste-04-qubo.md`: registro da formulacao QUBO escolhida. Status: concluido.
+- `testes/teste-05-qaoa-inicial.md`: primeira execucao QAOA. Status: concluido.
 
 Decisoes tecnicas a registrar:
 
@@ -58,6 +60,8 @@ Criterios minimos:
 - Se o QAOA nao superar o baseline, isso ainda pode ser resultado valido: a discussao deve focar viabilidade, custo e limitacoes.
 
 ## Fase 3 - Estresse por dimensionalidade
+
+Status: coleta preliminar concluida com QUBO exato; QAOA completo deve ser executado apenas em instancias pequenas por limitacao do Codespace.
 
 Objetivo: medir efeito de aumentar features via PCA.
 
