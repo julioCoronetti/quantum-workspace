@@ -6,7 +6,7 @@
 - [x] Estabilizar baseline VQC/SVM da Fase 1.
 - [x] Registrar resultado da Fase 1 em `testes/teste-03.md`.
 - [x] Criar pasta de apoio do artigo.
-- [ ] Validar com o orientador se o artigo final deve defender QAOA como experimento principal ou como proposta/continuidade, caso a Fase 2 fique limitada.
+- [ ] Validar com o orientador a decisão de apresentar os resultados como estudo exploratório preliminar.
 
 ## Referencias
 
@@ -22,7 +22,7 @@
 - [x] Implementar pipeline QAOA/Qiskit Optimization.
 - [x] Executar comparacao SVM classico vs. abordagem QAOA/QUBO.
 - [x] Executar variacao preliminar de PCA com 2, 3, 4 e 5 componentes usando QUBO exato.
-- [ ] Definir quais resultados serao tratados como finais no artigo.
+- [x] Definir resultados atuais como base preliminar/final do estudo exploratório.
 - [x] Salvar resultados preliminares em CSV.
 - [x] Gerar graficos preliminares para tempo e acuracia.
 
@@ -37,5 +37,5 @@
 - [x] Escrever Metodologia baseada nos scripts executados.
 - [x] Escrever Resultados e Discussoes apenas com dados medidos.
 - [x] Escrever Conclusao e trabalhos futuros.
-- [ ] Revisar resumo/abstract apos resultados fechados.
+- [x] Revisar resumo/abstract conforme decisão de estudo exploratório preliminar.
 - [ ] Compilar o LaTeX em ambiente com `pdflatex` e `biber`.

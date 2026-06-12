@@ -10,6 +10,7 @@ Esta pasta concentra o que precisa estar pronto antes de escrever o artigo no te
 - `referencias-candidatas.bib`: entradas BibTeX iniciais para migrar depois para `template_artigo_congresso_unisenai/referencias.bib`.
 - `plano-experimentos.md`: o que executar para gerar resultados rastreaveis.
 - `inventario-dados.md`: quais dados, tabelas e graficos serao necessarios.
+- `decisoes-artigo.md`: decisões assumidas para avançar o artigo sem depender de novas buscas ou execuções pesadas.
 
 ## Regra de trabalho
 
