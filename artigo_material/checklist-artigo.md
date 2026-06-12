@@ -29,7 +29,7 @@
 ## Escrita
 
 - [x] Definir titulo final em portugues e ingles.
-- [ ] Confirmar e-mails e formato final da autoria no template do evento.
+- [ ] Confirmar e-mail do orientador e formato final da autoria no template do evento.
 - [x] Escrever rascunho da Introducao.
 - [x] Estruturar Revisao de Literatura com marcadores de citacao.
 - [x] Substituir marcadores da Revisao por citacoes fundacionais verificadas.
