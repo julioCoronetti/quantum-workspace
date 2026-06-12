@@ -28,11 +28,12 @@
 
 ## Escrita
 
-- [ ] Definir titulo final em portugues e ingles.
+- [x] Definir titulo final em portugues e ingles.
 - [ ] Confirmar autores, instituicoes e e-mails.
-- [ ] Escrever Introducao.
-- [ ] Escrever Revisao de Literatura com citacoes.
-- [ ] Escrever Metodologia baseada nos scripts executados.
-- [ ] Escrever Resultados e Discussoes apenas com dados medidos.
-- [ ] Escrever Conclusao e trabalhos futuros.
+- [x] Escrever rascunho da Introducao.
+- [x] Estruturar Revisao de Literatura com marcadores de citacao.
+- [ ] Substituir marcadores da Revisao por citacoes reais da EBSCO ou bases equivalentes.
+- [x] Escrever Metodologia baseada nos scripts executados.
+- [x] Escrever Resultados e Discussoes apenas com dados medidos.
+- [x] Escrever Conclusao e trabalhos futuros.
 - [ ] Revisar resumo/abstract apos resultados fechados.

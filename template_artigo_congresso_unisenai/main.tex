@@ -12,8 +12,8 @@
 \usepackage[backend=biber, style=abnt]{biblatex} % ou 'style=apa', 'numeric', etc.
 \addbibresource{referencias.bib} % arquivo .bib com as referências
 
-\title{TÍTULO DO ARTIGO}
-\subtitle{ARTICLE TITLE}
+\title{Exploração do Algoritmo QAOA para Otimização em Modelos de Classificação Supervisionada utilizando Simuladores Quânticos}
+\subtitle{Exploration of the QAOA Algorithm for Optimization in Supervised Classification Models Using Quantum Simulators}
 
 \author{
     \textbf{Nome do Autor 1} \thanks{Instituição e e-mail do Autor 1.},\\
@@ -26,85 +26,167 @@
 \maketitle
 
 \begin{resumo}
-O resumo deve apresentar uma visão geral do trabalho, destacando objetivo, metodologia, resultados e conclusões. Deve ter no máximo 250 palavras e ser escrito em português.
+Este trabalho investiga a viabilidade de utilizar formulações de otimização discreta associadas ao algoritmo QAOA em tarefas de classificação supervisionada, utilizando simuladores quânticos e comparação com métodos clássicos. A metodologia adotou o conjunto de dados \textit{breast cancer} da biblioteca \textit{scikit-learn}, com separação estratificada entre treino e teste, normalização, redução de dimensionalidade por PCA e avaliação por acurácia e tempo de execução. Inicialmente, foi estabelecido um baseline com SVM linear e VQC simulado. Em seguida, foi implementada uma formulação QUBO simplificada de classificador linear discretizado, resolvida por QAOA em instâncias pequenas e por solução exata em uma análise preliminar de escalabilidade. Os resultados indicaram que o baseline VQC atingiu 83,33\% de acurácia, enquanto o SVM clássico atingiu 100,00\%. Na etapa QUBO/QAOA, a instância com 2 componentes PCA obteve 90,00\% de acurácia com QAOA, porém com tempo superior ao SVM. O aumento no número de variáveis binárias elevou significativamente o custo computacional, reforçando as limitações práticas de simulação clássica de algoritmos quânticos variacionais.
 \end{resumo}
 
 \begin{justify}
-    \textbf{Palavras-chave:} palavra1; palavra2; palavra3.
+    \textbf{Palavras-chave:} QAOA; QUBO; classificação supervisionada; aprendizado de máquina quântico; simuladores quânticos.
 \end{justify}
 
 \begin{abstract1}
-This is the abstract of the paper, written in English. It must summarize the work including objectives, methodology, results, and conclusions. Maximum 250 words.
+This work investigates the feasibility of using discrete optimization formulations associated with the QAOA algorithm in supervised classification tasks, using quantum simulators and comparison with classical methods. The methodology used the \textit{breast cancer} dataset from \textit{scikit-learn}, with stratified train-test split, normalization, dimensionality reduction through PCA, and evaluation by accuracy and execution time. First, a baseline was established with a linear SVM and a simulated VQC. Then, a simplified QUBO formulation of a discretized linear classifier was implemented and solved with QAOA in small instances and with an exact solver in a preliminary scalability analysis. The results indicated that the VQC baseline reached 83.33\% accuracy, while the classical SVM reached 100.00\%. In the QUBO/QAOA stage, the instance with 2 PCA components achieved 90.00\% accuracy with QAOA, although with higher execution time than SVM. Increasing the number of binary variables significantly increased computational cost, reinforcing the practical limitations of classical simulation of variational quantum algorithms.
 \end{abstract1}
 
 \begin{justify}
-    \textbf{Keywords:} keyword1; keyword2; keyword3.    
+    \textbf{Keywords:} QAOA; QUBO; supervised classification; quantum machine learning; quantum simulators.
 \end{justify}
 
 \newpage
 
 \section{Introdução}
-A introdução deve contextualizar o tema, apresentar o problema de pesquisa, justificar o estudo e mencionar os objetivos. Também pode apresentar a estrutura do artigo.
+A computação quântica tem sido investigada como uma alternativa promissora para problemas de otimização e aprendizado de máquina, especialmente no contexto de dispositivos quânticos de escala intermediária e sujeitos a ruído. Nesse cenário, algoritmos híbridos variacionais combinam circuitos quânticos parametrizados com rotinas clássicas de otimização, buscando explorar recursos quânticos sem exigir computadores quânticos plenamente tolerantes a falhas.
+
+Entre esses algoritmos, o QAOA (\textit{Quantum Approximate Optimization Algorithm}) se destaca por sua aplicação a problemas de otimização combinatória. Como tarefas de classificação supervisionada podem ser relacionadas a problemas de otimização, este trabalho explora a possibilidade de converter uma tarefa de classificação binária em uma formulação QUBO (\textit{Quadratic Unconstrained Binary Optimization}) e resolvê-la por meio de simulação quântica.
+
+O problema de pesquisa investigado é: em que medida uma formulação QUBO associada ao QAOA pode produzir resultados viáveis em uma tarefa de classificação supervisionada, quando comparada a abordagens clássicas como SVM? Para responder a essa questão, foram avaliadas métricas de acurácia e tempo de execução, considerando também o impacto do aumento de componentes PCA no número de variáveis binárias e no custo computacional.
+
+\textbf{Nota de citação:} esta seção ainda deve receber citações obtidas na EBSCO ou em bases equivalentes sobre QAOA, NISQ e aprendizado de máquina quântico.
 
 \section{Revisão de Literatura}
-Aqui você apresenta o embasamento teórico necessário. O uso de citações nesta secção é mandatório.
+Esta seção será consolidada após a seleção final de artigos na plataforma EBSCO. Para não introduzir referências não verificadas, o texto abaixo apresenta a estrutura conceitual que deverá ser sustentada por citações acadêmicas na versão final.
 
-As citações são recursos fundamentais em trabalhos científicos, pois permitem embasar argumentos com base em autores reconhecidos. Existem dois tipos principais: citação direta e citação indireta.
+\subsection{Computação quântica na era NISQ}
 
-A citação direta consiste na transcrição literal das palavras do autor consultado. Ela deve ser usada entre aspas quando tiver até três linhas ou em bloco recuado, sem aspas, quando for mais extensa. Por exemplo: segundo \textcite{knuth1984tex}, "TeX é um novo sistema de composição tipográfica destinado à criação de livros bonitos".
+A era NISQ descreve um estágio em que processadores quânticos possuem quantidade limitada de qubits, conectividade restrita e presença de ruído. Por isso, algoritmos híbridos, que distribuem o processo entre circuitos quânticos e otimizadores clássicos, tornam-se uma alternativa prática para experimentação em simuladores e dispositivos atuais. \textbf{[CITAR: artigo sobre NISQ, preferencialmente Preskill ou revisão recente via EBSCO.]}
 
-\begin{itemize}
-    \item \textbf{Exemplo de citação direta longa:}
-\end{itemize}
+\subsection{Algoritmos variacionais e QAOA}
 
-Segundo \textcite{freire1996pedagogia}, a educação deve ser pensada de maneira crítica e libertadora. O autor afirma:
+O QAOA é um algoritmo variacional voltado a problemas de otimização combinatória. Seu funcionamento depende da alternância entre operadores associados ao custo do problema e operadores de mistura, com parâmetros ajustados por um otimizador clássico. Essa característica permite que problemas formulados como QUBO sejam convertidos em Hamiltonianos de custo e avaliados em circuitos parametrizados. \textbf{[CITAR: artigo fundador do QAOA e revisão sobre algoritmos variacionais.]}
 
-\begin{quote}
-    Ensinar não é transferir conhecimento, mas criar as possibilidades para a sua própria produção ou a sua construção. Quem ensina aprende ao ensinar e quem aprende ensina ao aprender. Não há ensino sem pesquisa e pesquisa sem ensino. Esses quehaceres se encontram um no corpo do outro. Enquanto ensino, continuo buscando, pesquisando. Ensino porque busco, porque indaguei, porque indago e me indago. Pesquiso para constatar, constatando intervenho, intervindo educo e me educo.
-\end{quote}
+\subsection{Aprendizado de máquina quântico e classificação}
 
-Por outro lado, a citação indireta refere-se à reformulação das ideias do autor com as próprias palavras do estudante, sem copiar literalmente o texto. Mesmo assim, é obrigatório indicar a fonte. Por exemplo: O sistema TeX foi desenvolvido por Knuth com o objetivo de produzir livros com alta qualidade tipográfica \cite{knuth1984tex}.
+No contexto de aprendizado de máquina quântico, modelos de classificação podem utilizar circuitos quânticos para mapear dados clássicos em espaços de maior dimensionalidade ou para resolver formulações de otimização relacionadas ao treinamento de classificadores. Neste trabalho, a classificação supervisionada é tratada como uma tarefa de otimização discreta, permitindo sua integração com QUBO e QAOA. \textbf{[CITAR: artigos sobre quantum machine learning e classificação supervisionada.]}
 
-Ao final do documento, as referências serão listadas automaticamente.
+\subsection{Formulações QUBO}
+
+Um problema QUBO consiste em minimizar uma função quadrática sem restrições explícitas sobre variáveis binárias. Essa formulação é útil por permitir a representação de problemas combinatórios e sua posterior conversão para modelos compatíveis com algoritmos quânticos de otimização. Neste estudo, a formulação QUBO foi utilizada como ponte entre o problema de classificação e a execução por QAOA. \textbf{[CITAR: artigo/tutorial sobre QUBO e aplicações em aprendizado de máquina.]}
 
 \section{Metodologia}
-Descreva os métodos, ferramentas e processos usados no desenvolvimento do trabalho.
+O experimento foi desenvolvido em Python, utilizando as bibliotecas \textit{scikit-learn}, Qiskit, Qiskit Machine Learning, Qiskit Optimization e Qiskit Algorithms. A implementação foi organizada em dois scripts principais: \texttt{script.py}, responsável pelo baseline clássico e VQC, e \texttt{script\_qaoa.py}, responsável pela formulação QUBO e pelas execuções com QAOA.
 
-\subsection{Exemplo de Imagem}
-A Figura~\ref{fig:exemplo} mostra um exemplo de imagem.
+\subsection{Base de dados e pré-processamento}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{imgs/image.png}
-    \caption{Legenda da imagem conforme formatação do template.}
-    \label{fig:exemplo}
-\end{figure}
+Foi utilizado o conjunto de dados \textit{breast cancer}, disponibilizado pela biblioteca \textit{scikit-learn}. A amostra utilizada nos experimentos possui 100 registros selecionados de forma estratificada, mantendo a proporção entre as classes. Em seguida, os dados foram divididos em 70\% para treino e 30\% para teste, também com estratificação.
 
+O pré-processamento seguiu as seguintes etapas:
 
+\begin{enumerate}
+    \item Padronização dos atributos com \texttt{StandardScaler}, ajustado apenas no conjunto de treino.
+    \item Redução de dimensionalidade com PCA, também ajustado apenas no treino.
+    \item Reescala dos componentes para o intervalo \([0,1]\) com \texttt{MinMaxScaler}.
+\end{enumerate}
+
+Essa organização evita vazamento de informação do conjunto de teste para o treinamento.
+
+\subsection{Baseline clássico e baseline quântico variacional}
+
+O primeiro baseline foi um SVM linear, usado como referência clássica. Em seguida, foi implementado um classificador variacional quântico simulado (VQC), com mapa de características \texttt{ZZFeatureMap}, ansatz \texttt{RealAmplitudes} e otimizador SPSA com \texttt{maxiter=100}. Essa etapa teve como objetivo estabilizar um modelo quântico inicial antes da formulação QUBO/QAOA.
+
+\subsection{Formulação QUBO}
+
+Na etapa principal, a classificação foi representada como um classificador linear discretizado. Cada coeficiente do modelo, incluindo o viés, foi codificado por variáveis binárias de contribuição positiva e negativa. Para \(d\) componentes PCA, o número de variáveis binárias foi definido como:
+
+\[
+n_{bin} = 2(d + 1)
+\]
+
+A função objetivo minimizada foi uma perda quadrática de margem:
+
+\[
+\frac{1}{n}\sum_{i=1}^{n}(b + x_iw - y_i)^2
+\]
+
+em que \(b\) representa o viés, \(w\) os pesos discretizados, \(x_i\) os atributos após PCA e \(y_i \in \{-1, 1\}\) a classe transformada. Também foram adicionadas regularização quadrática dos coeficientes e penalização para evitar ativação simultânea de bits positivos e negativos do mesmo coeficiente.
+
+É importante destacar que esta formulação é uma aproximação experimental de classificador linear discretizado em QUBO, e não uma implementação completa do SVM dual.
+
+\subsection{Execução com QAOA e solver exato}
+
+O QUBO foi resolvido por QAOA em instâncias pequenas, usando \texttt{StatevectorSampler}, QAOA com \texttt{reps=1} e otimizador COBYLA. Para avaliar a escalabilidade da formulação sem sobrecarregar o ambiente de execução, também foi implementado um solver exato por força bruta para os QUBOs pequenos. Esse solver foi utilizado na análise preliminar com PCA variando de 2 a 5 componentes.
+
+As métricas coletadas foram acurácia, tempo de execução, número de componentes PCA e número de variáveis binárias.
 
 \section{Resultados e Discussões}
-Apresente os resultados obtidos, discutindo sua relevância e implicações. Inclua gráficos ou tabelas se necessário.
-
-\subsection{Exemplo de Tabela}
-A Tabela~\ref{tab:exemplo} mostra como inserir uma tabela no formato exigido.
+Na primeira etapa, o baseline clássico com SVM atingiu 100,00\% de acurácia no conjunto de teste, enquanto o VQC simulado atingiu 83,33\%. O resultado indica que o modelo quântico variacional foi capaz de superar o critério prático de 80\% estabelecido para a Fase 1, embora com tempo de execução superior ao SVM.
 
 \begin{table}[H]
     \centering
-    \caption{Legenda da tabela conforme formatação do template.}
-    \label{tab:exemplo}
+    \caption{Resultado do baseline da Fase 1.}
+    \label{tab:baseline}
     \begin{tabular}{|c|c|c|}
         \hline
-        Coluna 1 & Coluna 2 & Coluna 3 \\ \hline
-        Dado A1  & Dado A2  & Dado A3  \\ \hline
-        Dado B1  & Dado B2  & Dado B3  \\ \hline
+        Modelo & Acurácia & Tempo \\ \hline
+        SVM linear & 100,00\% & 0,0009 s \\ \hline
+        VQC simulado & 83,33\% & 12,8098 s \\ \hline
     \end{tabular}
 \end{table}
 
+Na etapa QUBO/QAOA inicial, foi executada uma instância com 2 componentes PCA, totalizando 6 variáveis binárias. O QAOA obteve 90,00\% de acurácia, enquanto o SVM linear manteve 100,00\%.
+
+\begin{table}[H]
+    \centering
+    \caption{Execução inicial QAOA/QUBO com 2 componentes PCA.}
+    \label{tab:qaoa-inicial}
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        Modelo & Variáveis binárias & Acurácia & Tempo \\ \hline
+        SVM linear & 0 & 100,00\% & 0,0013 s \\ \hline
+        QAOA-QUBO linear & 6 & 90,00\% & 3,6997 s \\ \hline
+    \end{tabular}
+\end{table}
+
+Para observar o impacto do aumento de dimensionalidade, foi utilizado o solver exato em QUBOs com PCA variando de 2 a 5 componentes. A acurácia permaneceu em 90,00\%, mas o tempo de solução aumentou conforme o número de variáveis binárias cresceu.
+
+\begin{table}[H]
+    \centering
+    \caption{Resultado preliminar do QUBO exato por número de componentes PCA.}
+    \label{tab:qubo-exato}
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        PCA & Variáveis binárias & Acurácia QUBO & Tempo QUBO \\ \hline
+        2 & 6  & 90,00\% & 0,0824 s \\ \hline
+        3 & 8  & 90,00\% & 0,4580 s \\ \hline
+        4 & 10 & 90,00\% & 1,2578 s \\ \hline
+        5 & 12 & 90,00\% & 7,1497 s \\ \hline
+    \end{tabular}
+\end{table}
+
+Com QAOA, o custo de execução cresceu de forma mais acentuada. A instância com 3 componentes PCA levou 41,7146 segundos, enquanto a instância com 4 componentes PCA, mesmo com \texttt{maxiter=5}, levou 863,4231 segundos.
+
+\begin{table}[H]
+    \centering
+    \caption{Resultado preliminar das execuções QAOA por número de componentes PCA.}
+    \label{tab:qaoa-pca}
+    \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        PCA & Variáveis binárias & Maxiter & Acurácia QAOA & Tempo QAOA \\ \hline
+        2 & 6  & 20 & 90,00\% & 3,6997 s \\ \hline
+        3 & 8  & 20 & 90,00\% & 41,7146 s \\ \hline
+        4 & 10 & 5  & 96,67\% & 863,4231 s \\ \hline
+    \end{tabular}
+\end{table}
+
+Os resultados sugerem que a formulação QUBO/QAOA é funcional em instâncias pequenas, mas apresenta forte limitação prática no ambiente de simulação utilizado. A diferença entre o tempo do SVM e o tempo das abordagens quânticas simuladas reforça que a análise de viabilidade deve considerar não apenas acurácia, mas também custo computacional, número de variáveis binárias e escalabilidade.
+
 \section{Conclusão}
-Retome os objetivos, resuma os principais resultados e indique possíveis trabalhos futuros.
+Este trabalho apresentou uma investigação preliminar sobre o uso de QAOA e formulações QUBO em uma tarefa de classificação supervisionada. O baseline clássico com SVM manteve melhor desempenho geral em acurácia e tempo, enquanto o baseline VQC e a formulação QAOA/QUBO demonstraram viabilidade experimental em instâncias pequenas.
+
+A formulação QUBO implementada permitiu converter a classificação em um problema de otimização discreta, resolvido por QAOA em cenários controlados. A instância inicial com 2 componentes PCA atingiu 90,00\% de acurácia, demonstrando que a abordagem pode produzir resultados competitivos em pequena escala. No entanto, o aumento do número de variáveis binárias elevou significativamente o tempo de execução, especialmente nas simulações com QAOA.
+
+Como trabalhos futuros, recomenda-se investigar formulações QUBO mais próximas do SVM dual, testar diferentes discretizações dos pesos, avaliar outros otimizadores clássicos, executar experimentos em ambientes com maior capacidade computacional e comparar os resultados com simulações ruidosas ou hardware quântico real.
 
 \section*{Agradecimentos}
-Inclua agradecimentos a instituições, financiamentos ou orientadores.
+Os agradecimentos serão preenchidos após confirmação de orientação, instituição e eventuais apoios.
 
 \printbibliography
 
