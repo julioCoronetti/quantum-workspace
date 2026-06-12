@@ -44,32 +44,30 @@ This work investigates the feasibility of using discrete optimization formulatio
 \newpage
 
 \section{Introdução}
-A computação quântica tem sido investigada como uma alternativa promissora para problemas de otimização e aprendizado de máquina, especialmente no contexto de dispositivos quânticos de escala intermediária e sujeitos a ruído. Nesse cenário, algoritmos híbridos variacionais combinam circuitos quânticos parametrizados com rotinas clássicas de otimização, buscando explorar recursos quânticos sem exigir computadores quânticos plenamente tolerantes a falhas.
+A computação quântica tem sido investigada como uma alternativa promissora para problemas de otimização e aprendizado de máquina, especialmente no contexto de dispositivos quânticos de escala intermediária e sujeitos a ruído \cite{preskill2018nisq,bharti2022nisq}. Nesse cenário, algoritmos híbridos variacionais combinam circuitos quânticos parametrizados com rotinas clássicas de otimização, buscando explorar recursos quânticos sem exigir computadores quânticos plenamente tolerantes a falhas \cite{cerezo2021vqa}.
 
-Entre esses algoritmos, o QAOA (\textit{Quantum Approximate Optimization Algorithm}) se destaca por sua aplicação a problemas de otimização combinatória. Como tarefas de classificação supervisionada podem ser relacionadas a problemas de otimização, este trabalho explora a possibilidade de converter uma tarefa de classificação binária em uma formulação QUBO (\textit{Quadratic Unconstrained Binary Optimization}) e resolvê-la por meio de simulação quântica.
+Entre esses algoritmos, o QAOA (\textit{Quantum Approximate Optimization Algorithm}) se destaca por sua aplicação a problemas de otimização combinatória \cite{farhi2014qaoa}. Como tarefas de classificação supervisionada podem ser relacionadas a problemas de otimização, este trabalho explora a possibilidade de converter uma tarefa de classificação binária em uma formulação QUBO (\textit{Quadratic Unconstrained Binary Optimization}) e resolvê-la por meio de simulação quântica \cite{glover2019qubo,lucas2014ising}.
 
 O problema de pesquisa investigado é: em que medida uma formulação QUBO associada ao QAOA pode produzir resultados viáveis em uma tarefa de classificação supervisionada, quando comparada a abordagens clássicas como SVM? Para responder a essa questão, foram avaliadas métricas de acurácia e tempo de execução, considerando também o impacto do aumento de componentes PCA no número de variáveis binárias e no custo computacional.
 
-\textbf{Nota de citação:} esta seção ainda deve receber citações obtidas na EBSCO ou em bases equivalentes sobre QAOA, NISQ e aprendizado de máquina quântico.
-
 \section{Revisão de Literatura}
-Esta seção será consolidada após a seleção final de artigos na plataforma EBSCO. Para não introduzir referências não verificadas, o texto abaixo apresenta a estrutura conceitual que deverá ser sustentada por citações acadêmicas na versão final.
+Esta seção apresenta a base conceitual usada no desenvolvimento do experimento. A versão final ainda pode ser complementada com artigos selecionados na plataforma EBSCO, especialmente para incluir estudos recentes e revisados por pares sobre aplicações de QAOA em classificação supervisionada.
 
 \subsection{Computação quântica na era NISQ}
 
-A era NISQ descreve um estágio em que processadores quânticos possuem quantidade limitada de qubits, conectividade restrita e presença de ruído. Por isso, algoritmos híbridos, que distribuem o processo entre circuitos quânticos e otimizadores clássicos, tornam-se uma alternativa prática para experimentação em simuladores e dispositivos atuais. \textbf{[CITAR: artigo sobre NISQ, preferencialmente Preskill ou revisão recente via EBSCO.]}
+A era NISQ descreve um estágio em que processadores quânticos possuem quantidade limitada de qubits, conectividade restrita e presença de ruído. Por isso, algoritmos híbridos, que distribuem o processo entre circuitos quânticos e otimizadores clássicos, tornam-se uma alternativa prática para experimentação em simuladores e dispositivos atuais \cite{preskill2018nisq,bharti2022nisq}.
 
 \subsection{Algoritmos variacionais e QAOA}
 
-O QAOA é um algoritmo variacional voltado a problemas de otimização combinatória. Seu funcionamento depende da alternância entre operadores associados ao custo do problema e operadores de mistura, com parâmetros ajustados por um otimizador clássico. Essa característica permite que problemas formulados como QUBO sejam convertidos em Hamiltonianos de custo e avaliados em circuitos parametrizados. \textbf{[CITAR: artigo fundador do QAOA e revisão sobre algoritmos variacionais.]}
+O QAOA é um algoritmo variacional voltado a problemas de otimização combinatória. Seu funcionamento depende da alternância entre operadores associados ao custo do problema e operadores de mistura, com parâmetros ajustados por um otimizador clássico \cite{farhi2014qaoa}. Essa característica permite que problemas formulados como QUBO sejam convertidos em Hamiltonianos de custo e avaliados em circuitos parametrizados, dentro do paradigma mais amplo dos algoritmos quânticos variacionais \cite{cerezo2021vqa}.
 
 \subsection{Aprendizado de máquina quântico e classificação}
 
-No contexto de aprendizado de máquina quântico, modelos de classificação podem utilizar circuitos quânticos para mapear dados clássicos em espaços de maior dimensionalidade ou para resolver formulações de otimização relacionadas ao treinamento de classificadores. Neste trabalho, a classificação supervisionada é tratada como uma tarefa de otimização discreta, permitindo sua integração com QUBO e QAOA. \textbf{[CITAR: artigos sobre quantum machine learning e classificação supervisionada.]}
+No contexto de aprendizado de máquina quântico, modelos de classificação podem utilizar circuitos quânticos para mapear dados clássicos em espaços de maior dimensionalidade ou para resolver formulações de otimização relacionadas ao treinamento de classificadores \cite{schuld2019feature,havlicek2019supervised}. Neste trabalho, a classificação supervisionada é tratada como uma tarefa de otimização discreta, permitindo sua integração com QUBO e QAOA. O SVM também aparece na literatura de aprendizado de máquina quântico como uma referência importante para tarefas de classificação \cite{rebentrost2014qsvm}.
 
 \subsection{Formulações QUBO}
 
-Um problema QUBO consiste em minimizar uma função quadrática sem restrições explícitas sobre variáveis binárias. Essa formulação é útil por permitir a representação de problemas combinatórios e sua posterior conversão para modelos compatíveis com algoritmos quânticos de otimização. Neste estudo, a formulação QUBO foi utilizada como ponte entre o problema de classificação e a execução por QAOA. \textbf{[CITAR: artigo/tutorial sobre QUBO e aplicações em aprendizado de máquina.]}
+Um problema QUBO consiste em minimizar uma função quadrática sem restrições explícitas sobre variáveis binárias. Essa formulação é útil por permitir a representação de problemas combinatórios e sua posterior conversão para modelos compatíveis com algoritmos quânticos de otimização \cite{glover2019qubo,lucas2014ising}. Neste estudo, a formulação QUBO foi utilizada como ponte entre o problema de classificação e a execução por QAOA.
 
 \section{Metodologia}
 O experimento foi desenvolvido em Python, utilizando as bibliotecas \textit{scikit-learn}, Qiskit, Qiskit Machine Learning, Qiskit Optimization e Qiskit Algorithms. A implementação foi organizada em dois scripts principais: \texttt{script.py}, responsável pelo baseline clássico e VQC, e \texttt{script\_qaoa.py}, responsável pela formulação QUBO e pelas execuções com QAOA.
@@ -90,7 +88,7 @@ Essa organização evita vazamento de informação do conjunto de teste para o t
 
 \subsection{Baseline clássico e baseline quântico variacional}
 
-O primeiro baseline foi um SVM linear, usado como referência clássica. Em seguida, foi implementado um classificador variacional quântico simulado (VQC), com mapa de características \texttt{ZZFeatureMap}, ansatz \texttt{RealAmplitudes} e otimizador SPSA com \texttt{maxiter=100}. Essa etapa teve como objetivo estabilizar um modelo quântico inicial antes da formulação QUBO/QAOA.
+O primeiro baseline foi um SVM linear, usado como referência clássica. Em seguida, foi implementado um classificador variacional quântico simulado (VQC), com mapa de características \texttt{ZZFeatureMap}, ansatz \texttt{RealAmplitudes} e otimizador SPSA com \texttt{maxiter=100}. O SPSA foi escolhido por ser um método de aproximação estocástica com perturbações simultâneas, frequentemente associado a cenários de otimização com ruído \cite{spall1992spsa}. Essa etapa teve como objetivo estabilizar um modelo quântico inicial antes da formulação QUBO/QAOA.
 
 \subsection{Formulação QUBO}
 

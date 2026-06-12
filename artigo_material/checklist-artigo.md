@@ -11,9 +11,9 @@
 ## Referencias
 
 - [x] Separar referencias candidatas centrais.
-- [ ] Confirmar no EBSCO/portal institucional quais referencias serao usadas formalmente.
-- [ ] Remover referencias de exemplo do `referencias.bib` do template.
-- [ ] Migrar apenas as referencias usadas para `template_artigo_congresso_unisenai/referencias.bib`.
+- [ ] Confirmar no EBSCO/portal institucional quais referencias complementares serao usadas formalmente.
+- [x] Remover referencias de exemplo do `referencias.bib` do template.
+- [x] Migrar referencias fundacionais usadas para `template_artigo_congresso_unisenai/referencias.bib`.
 
 ## Experimentos
 
@@ -32,8 +32,10 @@
 - [ ] Confirmar autores, instituicoes e e-mails.
 - [x] Escrever rascunho da Introducao.
 - [x] Estruturar Revisao de Literatura com marcadores de citacao.
-- [ ] Substituir marcadores da Revisao por citacoes reais da EBSCO ou bases equivalentes.
+- [x] Substituir marcadores da Revisao por citacoes fundacionais verificadas.
+- [ ] Complementar Revisao com artigos recentes da EBSCO.
 - [x] Escrever Metodologia baseada nos scripts executados.
 - [x] Escrever Resultados e Discussoes apenas com dados medidos.
 - [x] Escrever Conclusao e trabalhos futuros.
 - [ ] Revisar resumo/abstract apos resultados fechados.
+- [ ] Compilar o LaTeX em ambiente com `pdflatex` e `biber`.
