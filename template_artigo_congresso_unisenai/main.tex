@@ -28,7 +28,7 @@
 \maketitle
 
 \begin{resumo}
-Este trabalho investiga a viabilidade de utilizar formulações de otimização discreta associadas ao algoritmo QAOA em tarefas de classificação supervisionada, utilizando simuladores quânticos e comparação com métodos clássicos. A metodologia adotou o conjunto de dados \textit{breast cancer} da biblioteca \textit{scikit-learn}, com separação estratificada entre treino e teste, normalização, redução de dimensionalidade por PCA e avaliação por acurácia e tempo de execução. Inicialmente, foi estabelecido um baseline com SVM linear e VQC simulado. Em seguida, foi implementada uma formulação QUBO simplificada de classificador linear discretizado, resolvida por QAOA em instâncias pequenas e por solução exata em uma análise preliminar de escalabilidade. Os resultados indicaram que o baseline VQC atingiu 83,33\% de acurácia, enquanto o SVM clássico atingiu 100,00\%. Na etapa QUBO/QAOA, a instância com 2 componentes PCA obteve 90,00\% de acurácia com QAOA, porém com tempo superior ao SVM.
+Este estudo avalia a viabilidade de formulações de otimização discreta associadas ao algoritmo QAOA em tarefas de classificação supervisionada, utilizando simuladores quânticos e comparação com métodos clássicos. A metodologia adotou o conjunto de dados \textit{breast cancer} da biblioteca \textit{scikit-learn}, com separação estratificada entre treino e teste, normalização, redução de dimensionalidade por PCA e avaliação por acurácia e tempo de execução. Inicialmente, foi estabelecido um baseline com SVM linear e VQC simulado. Em seguida, foi implementada uma formulação QUBO simplificada de classificador linear discretizado, resolvida por QAOA em instâncias pequenas e por solução exata em uma análise preliminar de escalabilidade. Os resultados indicaram que o baseline VQC atingiu 83,33\% de acurácia, enquanto o SVM clássico atingiu 100,00\%. Na etapa QUBO/QAOA, a instância com 2 componentes PCA obteve 90,00\% de acurácia com QAOA, porém com tempo superior ao SVM.
 \end{resumo}
 
 \begin{justify}
@@ -36,7 +36,7 @@ Este trabalho investiga a viabilidade de utilizar formulações de otimização 
 \end{justify}
 
 \begin{abstract1}
-This work investigates the feasibility of using discrete optimization formulations associated with the QAOA algorithm in supervised classification tasks, using quantum simulators and comparison with classical methods. The methodology used the \textit{breast cancer} dataset from \textit{scikit-learn}, with stratified train-test split, normalization, dimensionality reduction through PCA, and evaluation by accuracy and execution time. First, a baseline was established with a linear SVM and a simulated VQC. Then, a simplified QUBO formulation of a discretized linear classifier was implemented and solved with QAOA in small instances and with an exact solver in a preliminary scalability analysis. The results indicated that the VQC baseline reached 83.33\% accuracy, while the classical SVM reached 100.00\%. In the QUBO/QAOA stage, the instance with 2 PCA components achieved 90.00\% accuracy with QAOA, although with higher execution time than SVM.
+This study evaluates the feasibility of discrete optimization formulations associated with the QAOA algorithm in supervised classification tasks, using quantum simulators and comparison with classical methods. The methodology used the \textit{breast cancer} dataset from \textit{scikit-learn}, with stratified train-test split, normalization, dimensionality reduction through PCA, and evaluation by accuracy and execution time. First, a baseline was established with a linear SVM and a simulated VQC. Then, a simplified QUBO formulation of a discretized linear classifier was implemented and solved with QAOA in small instances and with an exact solver in a preliminary scalability analysis. The results indicated that the VQC baseline reached 83.33\% accuracy, while the classical SVM reached 100.00\%. In the QUBO/QAOA stage, the instance with 2 PCA components achieved 90.00\% accuracy with QAOA, although with higher execution time than SVM.
 \end{abstract1}
 
 \begin{justify}
@@ -46,36 +46,36 @@ This work investigates the feasibility of using discrete optimization formulatio
 \newpage
 
 \section{Introdução}
-A computação quântica tem sido investigada como uma alternativa promissora para problemas de otimização e aprendizado de máquina, especialmente no contexto de dispositivos quânticos de escala intermediária e sujeitos a ruído \cite{preskill2018nisq,bharti2022nisq}. Nesse cenário, algoritmos híbridos variacionais combinam circuitos quânticos parametrizados com rotinas clássicas de otimização, buscando explorar recursos quânticos sem exigir computadores quânticos plenamente tolerantes a falhas \cite{cerezo2021vqa,grange2024vqa}.
+A computação quântica ainda não substitui os métodos clássicos de aprendizado de máquina, mas já permite investigar novas formas de formular problemas de otimização. Esse recorte é especialmente importante na era NISQ, em que os dispositivos possuem número limitado de qubits, ruído e restrições de profundidade de circuito \cite{preskill2018nisq,bharti2022nisq}. Por isso, algoritmos híbridos variacionais, que combinam circuitos quânticos parametrizados com rotinas clássicas de otimização, tornaram-se uma alternativa prática para estudos exploratórios \cite{cerezo2021vqa,grange2024vqa}.
 
-Entre esses algoritmos, o QAOA (\textit{Quantum Approximate Optimization Algorithm}) se destaca por sua aplicação a problemas de otimização combinatória \cite{farhi2014qaoa}. Como tarefas de classificação supervisionada podem ser relacionadas a problemas de otimização, este trabalho explora a possibilidade de converter uma tarefa de classificação binária em uma formulação QUBO (\textit{Quadratic Unconstrained Binary Optimization}) e resolvê-la por meio de simulação quântica \cite{glover2019qubo,lucas2014ising}.
+Entre esses algoritmos, o QAOA (\textit{Quantum Approximate Optimization Algorithm}) se destaca por lidar diretamente com problemas de otimização combinatória \cite{farhi2014qaoa}. A classificação supervisionada, embora normalmente tratada por modelos estatísticos ou geométricos, também pode ser interpretada como um problema de busca por parâmetros que minimizam uma função de erro. A partir dessa ligação, este trabalho converte uma tarefa de classificação binária em uma formulação QUBO (\textit{Quadratic Unconstrained Binary Optimization}) e avalia sua resolução por simulação quântica \cite{glover2019qubo,lucas2014ising}.
 
-O problema de pesquisa investigado é: em que medida uma formulação QUBO associada ao QAOA pode produzir resultados viáveis em uma tarefa de classificação supervisionada, quando comparada a abordagens clássicas como SVM? Para responder a essa questão, foram avaliadas métricas de acurácia e tempo de execução, considerando também o impacto do aumento de componentes PCA no número de variáveis binárias e no custo computacional.
+A questão central não é demonstrar vantagem quântica, mas verificar até onde uma formulação QUBO associada ao QAOA consegue produzir resultados utilizáveis em uma tarefa pequena de classificação. Para isso, a abordagem foi comparada com SVM linear e VQC simulado, considerando acurácia, tempo de execução e crescimento do número de variáveis binárias após a variação de componentes PCA.
 
 \clearpage
 
 \section{Revisão de Literatura}
-Esta seção apresenta a base conceitual usada no desenvolvimento do experimento, articulando referências fundacionais com estudos recentes revisados por pares.
+Esta seção organiza os conceitos que orientaram o experimento. As referências foram usadas para justificar três decisões principais: trabalhar em escala compatível com a era NISQ, reduzir dimensionalidade antes dos circuitos e tratar a formulação QUBO como uma ponte experimental entre classificação e otimização combinatória.
 
 \subsection{Computação quântica na era NISQ}
 
-A era NISQ descreve um estágio em que processadores quânticos possuem quantidade limitada de qubits, conectividade restrita e presença de ruído. Por isso, algoritmos híbridos, que distribuem o processo entre circuitos quânticos e otimizadores clássicos, tornam-se uma alternativa prática para experimentação em simuladores e dispositivos atuais \cite{preskill2018nisq,bharti2022nisq}. Estudos recentes com processadores reais e VQCs também reforçam que ruído, orçamento de medições, profundidade de circuito e condições de hardware afetam diretamente a estabilidade dos resultados \cite{singh2026quantumarithmetic,park2026vqcsensitivity}.
+A era NISQ descreve um estágio em que processadores quânticos possuem quantidade limitada de qubits, conectividade restrita e presença de ruído. Essa limitação ajuda a explicar por que este trabalho adota simulação e instâncias pequenas, em vez de propor uma solução quântica em larga escala. Algoritmos híbridos, que distribuem o processo entre circuitos quânticos e otimizadores clássicos, tornam-se uma alternativa prática para esse tipo de investigação \cite{preskill2018nisq,bharti2022nisq}. Estudos recentes com processadores reais e VQCs reforçam a mesma cautela: ruído, orçamento de medições, profundidade de circuito e condições de hardware afetam diretamente a estabilidade dos resultados \cite{singh2026quantumarithmetic,park2026vqcsensitivity}.
 
 \subsection{Algoritmos variacionais e QAOA}
 
-O QAOA é um algoritmo variacional voltado a problemas de otimização combinatória. Seu funcionamento depende da alternância entre operadores associados ao custo do problema e operadores de mistura, com parâmetros ajustados por um otimizador clássico \cite{farhi2014qaoa}. Essa característica permite que problemas formulados como QUBO sejam convertidos em Hamiltonianos de custo e avaliados em circuitos parametrizados, dentro do paradigma mais amplo dos algoritmos quânticos variacionais \cite{cerezo2021vqa,grange2024vqa}.
+O QAOA é um algoritmo variacional voltado a problemas de otimização combinatória. Seu funcionamento alterna operadores associados ao custo do problema e operadores de mistura, enquanto os parâmetros são ajustados por um otimizador clássico \cite{farhi2014qaoa}. Essa estrutura torna o QAOA adequado para este estudo porque um problema QUBO pode ser convertido em Hamiltoniano de custo e avaliado por circuitos parametrizados, seguindo o paradigma mais amplo dos algoritmos quânticos variacionais \cite{cerezo2021vqa,grange2024vqa}.
 
 \subsection{Aprendizado de máquina quântico e classificação}
 
-No contexto de aprendizado de máquina quântico, modelos de classificação podem utilizar circuitos quânticos para mapear dados clássicos em espaços de maior dimensionalidade ou para resolver formulações de otimização relacionadas ao treinamento de classificadores \cite{schuld2019feature,havlicek2019supervised}. Revisões recentes indicam que QML ainda é um campo em consolidação, com aplicações recorrentes em classificadores, redes neurais quânticas e métodos de kernel \cite{sood2024qmlreview}. Neste trabalho, a classificação supervisionada é tratada como uma tarefa de otimização discreta, permitindo sua integração com QUBO e QAOA. O SVM também aparece na literatura de aprendizado de máquina quântico como uma referência importante para tarefas de classificação \cite{rebentrost2014qsvm}.
+No aprendizado de máquina quântico, modelos de classificação podem usar circuitos quânticos para mapear dados clássicos em espaços de maior dimensionalidade ou para resolver formulações de otimização ligadas ao treinamento de classificadores \cite{schuld2019feature,havlicek2019supervised}. Revisões recentes indicam que QML ainda é um campo em consolidação, com aplicações recorrentes em classificadores, redes neurais quânticas e métodos de kernel \cite{sood2024qmlreview}. Neste trabalho, o SVM cumpre dois papéis: serve como baseline clássico forte e também como referência conceitual, já que aparece na literatura de aprendizado de máquina quântico aplicada à classificação \cite{rebentrost2014qsvm}.
 
 \subsection{Pré-processamento, dimensionalidade e otimizadores}
 
-O pré-processamento dos dados é uma etapa crítica em modelos quânticos de classificação. Estudos sobre classificação em QML indicam que técnicas clássicas de codificação e redução de dimensionalidade podem influenciar diretamente o desempenho de modelos variacionais em ambientes NISQ \cite{mancilla2022qmlpreprocessing}. Essa preocupação também aparece em estudos sobre VQCs aplicados a dados de alta dimensionalidade, nos quais o aumento do número de atributos demanda mais qubits, eleva o tempo de treinamento e dificulta a convergência \cite{qi2025hevqc}. Além disso, a seleção do otimizador clássico pode alterar tanto a acurácia quanto o tempo de treinamento em modelos de QML, o que justifica comparar otimizadores como COBYLA, SPSA e variantes baseadas em gradiente \cite{alajmi2025qmloptimizers}.
+O pré-processamento dos dados é uma etapa crítica em modelos quânticos de classificação. Estudos sobre QML indicam que técnicas clássicas de codificação e redução de dimensionalidade influenciam diretamente o desempenho de modelos variacionais em ambientes NISQ \cite{mancilla2022qmlpreprocessing}. Esse ponto justifica o uso de PCA no experimento: reduzir atributos diminui a quantidade de variáveis e torna a simulação viável. A mesma preocupação aparece em estudos sobre VQCs aplicados a dados de alta dimensionalidade, nos quais o aumento do número de atributos demanda mais qubits, eleva o tempo de treinamento e dificulta a convergência \cite{qi2025hevqc}. Além disso, a seleção do otimizador clássico pode alterar tanto a acurácia quanto o tempo de treinamento em modelos de QML, o que justifica o uso de SPSA e COBYLA em etapas diferentes do estudo \cite{alajmi2025qmloptimizers}.
 
 \subsection{Formulações QUBO}
 
-Um problema QUBO consiste em minimizar uma função quadrática sem restrições explícitas sobre variáveis binárias. Essa formulação é útil por permitir a representação de problemas combinatórios e sua posterior conversão para modelos compatíveis com algoritmos quânticos de otimização \cite{glover2019qubo,lucas2014ising}. Em problemas de classificação, há trabalhos recentes que exploram a representação de SVM como problema QUBO e comparam abordagens clássicas, quânticas e híbridas \cite{guddanti2024pneumoniasvmqubo}. Neste estudo, a formulação QUBO foi utilizada como ponte entre o problema de classificação e a execução por QAOA.
+Um problema QUBO consiste em minimizar uma função quadrática sem restrições explícitas sobre variáveis binárias. Essa formulação é útil por permitir a representação de problemas combinatórios e sua posterior conversão para modelos compatíveis com algoritmos quânticos de otimização \cite{glover2019qubo,lucas2014ising}. Em classificação, há trabalhos recentes que exploram a representação de SVM como problema QUBO e comparam abordagens clássicas, quânticas e híbridas \cite{guddanti2024pneumoniasvmqubo}. Neste estudo, a formulação QUBO foi usada de forma mais restrita: ela funciona como uma aproximação experimental de classificador linear discretizado, suficiente para avaliar o comportamento inicial do QAOA, mas sem substituir uma formulação completa do SVM.
 
 \clearpage
 
@@ -130,7 +130,7 @@ As métricas coletadas foram acurácia, tempo de execução, número de componen
 
 \subsection{Baseline da Fase 1}
 
-Na primeira etapa, o baseline clássico com SVM atingiu 100,00\% de acurácia no conjunto de teste, enquanto o VQC simulado atingiu 83,33\%. O resultado indica que o modelo quântico variacional foi capaz de superar o critério prático de 80\% estabelecido para a Fase 1, embora com tempo de execução superior ao SVM.
+O primeiro resultado funciona como controle para as etapas seguintes. O baseline clássico com SVM atingiu 100,00\% de acurácia no conjunto de teste, enquanto o VQC simulado atingiu 83,33\%. Assim, o modelo quântico variacional superou o critério prático de 80\% estabelecido para a Fase 1, mas ainda com tempo de execução superior ao SVM.
 
 \begin{table}[H]
     \centering
@@ -148,7 +148,7 @@ Na primeira etapa, o baseline clássico com SVM atingiu 100,00\% de acurácia no
 
 \subsection{Execução inicial QUBO/QAOA}
 
-Na etapa QUBO/QAOA inicial, foi executada uma instância com 2 componentes PCA, totalizando 6 variáveis binárias. O QAOA obteve 90,00\% de acurácia, enquanto o SVM linear manteve 100,00\%.
+Na etapa QUBO/QAOA inicial, foi executada uma instância com 2 componentes PCA, totalizando 6 variáveis binárias. O QAOA obteve 90,00\% de acurácia, enquanto o SVM linear manteve 100,00\%. Esse resultado não indica superioridade do método quântico, mas mostra que a formulação proposta consegue gerar uma fronteira de decisão utilizável em escala pequena.
 
 \begin{table}[H]
     \centering
@@ -166,7 +166,7 @@ Na etapa QUBO/QAOA inicial, foi executada uma instância com 2 componentes PCA, 
 
 \subsection{Análise preliminar de escalabilidade}
 
-Para observar o impacto do aumento de dimensionalidade, foi utilizado o solver exato em QUBOs com PCA variando de 2 a 5 componentes. A acurácia permaneceu em 90,00\%, mas o tempo de solução aumentou conforme o número de variáveis binárias cresceu.
+Para observar o impacto do aumento de dimensionalidade, foi utilizado o solver exato em QUBOs com PCA variando de 2 a 5 componentes. A acurácia permaneceu em 90,00\%, mas o tempo de solução aumentou conforme o número de variáveis binárias cresceu. Essa etapa separa dois aspectos do problema: a qualidade da formulação de classificação e o custo de busca no espaço binário.
 
 \begin{table}[H]
     \centering
@@ -201,16 +201,16 @@ Com QAOA, o custo de execução cresceu de forma mais acentuada. A instância co
     \end{tabular}
 \end{table}
 
-Os resultados sugerem que a formulação QUBO/QAOA é funcional em instâncias pequenas, mas apresenta forte limitação prática no ambiente de simulação utilizado. A diferença entre o tempo do SVM e o tempo das abordagens quânticas simuladas reforça que a análise de viabilidade deve considerar não apenas acurácia, mas também custo computacional, número de variáveis binárias e escalabilidade. Essa interpretação é consistente com estudos recentes sobre VQCs e dispositivos NISQ, que indicam sensibilidade a codificação, profundidade de circuito, ruído e dimensionalidade dos dados \cite{qi2025hevqc,park2026vqcsensitivity,singh2026quantumarithmetic}.
+Em conjunto, os resultados mostram uma diferença importante entre funcionar e escalar. A formulação QUBO/QAOA produziu classificações coerentes em instâncias pequenas, mas o custo de simulação cresceu rapidamente. A comparação com o SVM deixa claro que a viabilidade da abordagem não pode ser avaliada apenas pela acurácia: tempo de execução, número de variáveis binárias e escalabilidade são parte central da análise. Essa interpretação é consistente com estudos recentes sobre VQCs e dispositivos NISQ, que indicam sensibilidade a codificação, profundidade de circuito, ruído e dimensionalidade dos dados \cite{qi2025hevqc,park2026vqcsensitivity,singh2026quantumarithmetic}.
 
 \clearpage
 
 \section{Conclusão}
-Este trabalho apresentou uma investigação preliminar sobre o uso de QAOA e formulações QUBO em uma tarefa de classificação supervisionada. O baseline clássico com SVM manteve melhor desempenho geral em acurácia e tempo, enquanto o baseline VQC e a formulação QAOA/QUBO demonstraram viabilidade experimental em instâncias pequenas.
+Este trabalho analisou, em caráter exploratório, o uso de QAOA e formulações QUBO em uma tarefa de classificação supervisionada. O SVM clássico manteve o melhor desempenho geral em acurácia e tempo, enquanto o VQC e a formulação QAOA/QUBO demonstraram viabilidade apenas em instâncias pequenas.
 
-A formulação QUBO implementada permitiu converter a classificação em um problema de otimização discreta, resolvido por QAOA em cenários controlados. A instância inicial com 2 componentes PCA atingiu 90,00\% de acurácia, demonstrando que a abordagem pode produzir resultados competitivos em pequena escala. No entanto, o aumento do número de variáveis binárias elevou significativamente o tempo de execução, especialmente nas simulações com QAOA.
+A principal contribuição do estudo está na formulação e na análise de seus limites, não na defesa de superioridade quântica. A classificação foi convertida em um problema de otimização discreta, resolvido por QAOA em cenários controlados. A instância com 2 componentes PCA atingiu 90,00\% de acurácia, demonstrando que a abordagem pode produzir uma solução competitiva em pequena escala. No entanto, o aumento do número de variáveis binárias elevou significativamente o tempo de execução, especialmente nas simulações com QAOA.
 
-Como trabalhos futuros, recomenda-se investigar formulações QUBO mais próximas do SVM dual, testar diferentes discretizações dos pesos, avaliar outros otimizadores clássicos, executar experimentos em ambientes com maior capacidade computacional e comparar os resultados com simulações ruidosas ou hardware quântico real.
+Como próximos passos, recomenda-se investigar formulações QUBO mais próximas do SVM dual, testar diferentes discretizações dos pesos, avaliar outros otimizadores clássicos e executar experimentos em ambientes com maior capacidade computacional. Também seria relevante comparar os resultados com simulações ruidosas ou hardware quântico real, para aproximar o estudo das limitações observadas em dispositivos NISQ.
 
 \section*{Agradecimentos}
 Agradece-se ao SENAI pelo apoio institucional ao desenvolvimento desta iniciação científica.
