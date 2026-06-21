@@ -43,12 +43,11 @@
 }
 
 \newenvironment{resumo}{
-  \textbf{RESUMO}\\
+  \par\noindent\textbf{RESUMO}\par\vspace{0.35em}
   \justifying
-}{\par}
+}{\par\vspace{0.75em}}
 
 \newenvironment{abstract1}{
-  \textbf{ABSTRACT}\\
+  \par\noindent\textbf{ABSTRACT}\par\vspace{0.35em}
   \justifying
-}{\par}
-
+}{\par\vspace{0.75em}}

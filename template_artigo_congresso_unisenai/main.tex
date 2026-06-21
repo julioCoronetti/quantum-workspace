@@ -49,6 +49,8 @@ Entre esses algoritmos, o QAOA (\textit{Quantum Approximate Optimization Algorit
 
 O problema de pesquisa investigado é: em que medida uma formulação QUBO associada ao QAOA pode produzir resultados viáveis em uma tarefa de classificação supervisionada, quando comparada a abordagens clássicas como SVM? Para responder a essa questão, foram avaliadas métricas de acurácia e tempo de execução, considerando também o impacto do aumento de componentes PCA no número de variáveis binárias e no custo computacional.
 
+\clearpage
+
 \section{Revisão de Literatura}
 Esta seção apresenta a base conceitual usada no desenvolvimento do experimento, articulando referências fundacionais com estudos recentes revisados por pares.
 
@@ -71,6 +73,8 @@ O pré-processamento dos dados é uma etapa crítica em modelos quânticos de cl
 \subsection{Formulações QUBO}
 
 Um problema QUBO consiste em minimizar uma função quadrática sem restrições explícitas sobre variáveis binárias. Essa formulação é útil por permitir a representação de problemas combinatórios e sua posterior conversão para modelos compatíveis com algoritmos quânticos de otimização \cite{glover2019qubo,lucas2014ising}. Em problemas de classificação, há trabalhos recentes que exploram a representação de SVM como problema QUBO e comparam abordagens clássicas, quânticas e híbridas \cite{guddanti2024pneumoniasvmqubo}. Neste estudo, a formulação QUBO foi utilizada como ponte entre o problema de classificação e a execução por QAOA.
+
+\clearpage
 
 \section{Metodologia}
 O experimento foi desenvolvido em Python, utilizando as bibliotecas \textit{scikit-learn}, Qiskit, Qiskit Machine Learning, Qiskit Optimization e Qiskit Algorithms. A implementação foi organizada em dois scripts principais: \texttt{script.py}, responsável pelo baseline clássico e VQC, e \texttt{script\_qaoa.py}, responsável pela formulação QUBO e pelas execuções com QAOA.
@@ -117,20 +121,29 @@ O QUBO foi resolvido por QAOA em instâncias pequenas, usando \texttt{Statevecto
 
 As métricas coletadas foram acurácia, tempo de execução, número de componentes PCA e número de variáveis binárias.
 
+\clearpage
+
 \section{Resultados e Discussões}
+
+\subsection{Baseline da Fase 1}
+
 Na primeira etapa, o baseline clássico com SVM atingiu 100,00\% de acurácia no conjunto de teste, enquanto o VQC simulado atingiu 83,33\%. O resultado indica que o modelo quântico variacional foi capaz de superar o critério prático de 80\% estabelecido para a Fase 1, embora com tempo de execução superior ao SVM.
 
 \begin{table}[H]
     \centering
     \caption{Resultado do baseline da Fase 1.}
     \label{tab:baseline}
-    \begin{tabular}{|c|c|c|}
-        \hline
-        Modelo & Acurácia & Tempo \\ \hline
-        SVM linear & 100,00\% & 0,0009 s \\ \hline
-        VQC simulado & 83,33\% & 12,8098 s \\ \hline
+    \begin{tabular}{lcc}
+        \toprule
+        Modelo & Acurácia & Tempo \\
+        \midrule
+        SVM linear & 100,00\% & 0,0009 s \\
+        VQC simulado & 83,33\% & 12,8098 s \\
+        \bottomrule
     \end{tabular}
 \end{table}
+
+\subsection{Execução inicial QUBO/QAOA}
 
 Na etapa QUBO/QAOA inicial, foi executada uma instância com 2 componentes PCA, totalizando 6 variáveis binárias. O QAOA obteve 90,00\% de acurácia, enquanto o SVM linear manteve 100,00\%.
 
@@ -138,13 +151,17 @@ Na etapa QUBO/QAOA inicial, foi executada uma instância com 2 componentes PCA, 
     \centering
     \caption{Execução inicial QAOA/QUBO com 2 componentes PCA.}
     \label{tab:qaoa-inicial}
-    \begin{tabular}{|c|c|c|c|}
-        \hline
-        Modelo & Variáveis binárias & Acurácia & Tempo \\ \hline
-        SVM linear & 0 & 100,00\% & 0,0013 s \\ \hline
-        QAOA-QUBO linear & 6 & 90,00\% & 3,6997 s \\ \hline
+    \begin{tabular}{lccc}
+        \toprule
+        Modelo & Variáveis binárias & Acurácia & Tempo \\
+        \midrule
+        SVM linear & 0 & 100,00\% & 0,0013 s \\
+        QAOA-QUBO linear & 6 & 90,00\% & 3,6997 s \\
+        \bottomrule
     \end{tabular}
 \end{table}
+
+\subsection{Análise preliminar de escalabilidade}
 
 Para observar o impacto do aumento de dimensionalidade, foi utilizado o solver exato em QUBOs com PCA variando de 2 a 5 componentes. A acurácia permaneceu em 90,00\%, mas o tempo de solução aumentou conforme o número de variáveis binárias cresceu.
 
@@ -152,13 +169,15 @@ Para observar o impacto do aumento de dimensionalidade, foi utilizado o solver e
     \centering
     \caption{Resultado preliminar do QUBO exato por número de componentes PCA.}
     \label{tab:qubo-exato}
-    \begin{tabular}{|c|c|c|c|}
-        \hline
-        PCA & Variáveis binárias & Acurácia QUBO & Tempo QUBO \\ \hline
-        2 & 6  & 90,00\% & 0,0824 s \\ \hline
-        3 & 8  & 90,00\% & 0,4580 s \\ \hline
-        4 & 10 & 90,00\% & 1,2578 s \\ \hline
-        5 & 12 & 90,00\% & 7,1497 s \\ \hline
+    \begin{tabular}{cccc}
+        \toprule
+        PCA & Variáveis binárias & Acurácia QUBO & Tempo QUBO \\
+        \midrule
+        2 & 6  & 90,00\% & 0,0824 s \\
+        3 & 8  & 90,00\% & 0,4580 s \\
+        4 & 10 & 90,00\% & 1,2578 s \\
+        5 & 12 & 90,00\% & 7,1497 s \\
+        \bottomrule
     \end{tabular}
 \end{table}
 
@@ -168,16 +187,20 @@ Com QAOA, o custo de execução cresceu de forma mais acentuada. A instância co
     \centering
     \caption{Resultado preliminar das execuções QAOA por número de componentes PCA.}
     \label{tab:qaoa-pca}
-    \begin{tabular}{|c|c|c|c|c|}
-        \hline
-        PCA & Variáveis binárias & Maxiter & Acurácia QAOA & Tempo QAOA \\ \hline
-        2 & 6  & 20 & 90,00\% & 3,6997 s \\ \hline
-        3 & 8  & 20 & 90,00\% & 41,7146 s \\ \hline
-        4 & 10 & 5  & 96,67\% & 863,4231 s \\ \hline
+    \begin{tabular}{ccccc}
+        \toprule
+        PCA & Variáveis binárias & Maxiter & Acurácia QAOA & Tempo QAOA \\
+        \midrule
+        2 & 6  & 20 & 90,00\% & 3,6997 s \\
+        3 & 8  & 20 & 90,00\% & 41,7146 s \\
+        4 & 10 & 5  & 96,67\% & 863,4231 s \\
+        \bottomrule
     \end{tabular}
 \end{table}
 
 Os resultados sugerem que a formulação QUBO/QAOA é funcional em instâncias pequenas, mas apresenta forte limitação prática no ambiente de simulação utilizado. A diferença entre o tempo do SVM e o tempo das abordagens quânticas simuladas reforça que a análise de viabilidade deve considerar não apenas acurácia, mas também custo computacional, número de variáveis binárias e escalabilidade. Essa interpretação é consistente com estudos recentes sobre VQCs e dispositivos NISQ, que indicam sensibilidade a codificação, profundidade de circuito, ruído e dimensionalidade dos dados \cite{qi2025hevqc,park2026vqcsensitivity,singh2026quantumarithmetic}.
+
+\clearpage
 
 \section{Conclusão}
 Este trabalho apresentou uma investigação preliminar sobre o uso de QAOA e formulações QUBO em uma tarefa de classificação supervisionada. O baseline clássico com SVM manteve melhor desempenho geral em acurácia e tempo, enquanto o baseline VQC e a formulação QAOA/QUBO demonstraram viabilidade experimental em instâncias pequenas.
@@ -188,6 +211,8 @@ Como trabalhos futuros, recomenda-se investigar formulações QUBO mais próxima
 
 \section*{Agradecimentos}
 Agradece-se ao SENAI pelo apoio institucional ao desenvolvimento desta iniciação científica.
+
+\clearpage
 
 \printbibliography
 
