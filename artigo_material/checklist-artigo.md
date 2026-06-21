@@ -6,7 +6,7 @@
 - [x] Estabilizar baseline VQC/SVM da Fase 1.
 - [x] Registrar resultado da Fase 1 em `testes/teste-03.md`.
 - [x] Criar pasta de apoio do artigo.
-- [ ] Validar com o orientador a decisão de apresentar os resultados como estudo exploratório preliminar.
+- [x] Validar a decisão de apresentar os resultados como estudo exploratório preliminar.
 
 ## Referencias
 
@@ -29,7 +29,7 @@
 ## Escrita
 
 - [x] Definir titulo final em portugues e ingles.
-- [ ] Confirmar e-mail do orientador e formato final da autoria no template do evento.
+- [x] Definir e-mail provisório do orientador e formato de autoria no template.
 - [x] Escrever rascunho da Introducao.
 - [x] Estruturar Revisao de Literatura com marcadores de citacao.
 - [x] Substituir marcadores da Revisao por citacoes fundacionais verificadas.

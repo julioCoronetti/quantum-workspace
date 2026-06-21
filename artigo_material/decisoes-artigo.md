@@ -8,12 +8,13 @@ Este arquivo registra as decisões assumidas para avançar o artigo sem depender
 
 - Usar o e-mail acadêmico do autor: `julio.regino2@senaisp.edu.br`.
 - Manter Julio Coronetti Regino como discente do curso de Análise e Desenvolvimento de Sistemas.
-- Manter Cainã Antunes como orientador no bloco de autoria.
-- Pendência real: confirmar o e-mail institucional do orientador e se o template/evento exige orientador como coautor, nota de rodapé ou agradecimento.
+- Registrar Cainã Antunes como orientador no bloco de autoria.
+- Usar e-mail provisório do orientador: `orientador@senaisp.edu.br`.
+- Não há limite de páginas informado para o artigo.
 
 ## Status dos resultados
 
-Decisão recomendada: tratar os resultados como **resultados preliminares de um estudo exploratório**.
+Decisão confirmada: tratar os resultados como **resultados preliminares de um estudo exploratório**.
 
 Justificativa:
 
@@ -45,18 +46,24 @@ Novos experimentos só devem ser executados se o orientador pedir explicitamente
 
 ## Figuras e tabelas
 
-Decisão recomendada: manter tabelas no corpo principal do artigo e usar os gráficos SVG como material de apoio.
+Decisão atual: manter tabelas no corpo principal do artigo e usar os gráficos SVG como material de apoio.
 
 Justificativa:
 
 - O template LaTeX atual ainda não foi compilado.
 - O Codespace não possui `pdflatex`, `biber` ou `latexmk`.
-- SVG pode exigir conversão para PNG ou PDF no Overleaf.
+- SVG pode exigir conversão para PNG ou PDF no Overleaf, então só vale converter se o template exigir.
 
-Pendência real:
+Decisão prática:
 
-- Testar no Overleaf se o template aceita SVG.
-- Se não aceitar, converter os gráficos para PNG/PDF.
+- Não tentar resolver figuras agora sem erro concreto de compilação.
+- Se o Overleaf não aceitar SVG, converter os gráficos para PNG/PDF.
+
+## Regras do evento/template
+
+- Limite de páginas informado: não há limite.
+- Como não há regra adicional conhecida, manter o template atual.
+- Ajustes finais devem ser feitos apenas se a compilação no Overleaf apontar erro ou exigência específica do template.
 
 ## EBSCO
 
