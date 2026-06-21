@@ -60,9 +60,9 @@ Pendência real:
 
 ## EBSCO
 
-Decisão recomendada: a EBSCO deve ser usada como complemento, não como bloqueio para continuar o artigo.
+Decisão atual: a EBSCO foi usada como complemento da revisão de literatura, sem substituir as referências fundacionais.
 
-O artigo já possui referências fundacionais sobre:
+O artigo possui referências fundacionais sobre:
 
 - QAOA.
 - NISQ.
@@ -71,11 +71,20 @@ O artigo já possui referências fundacionais sobre:
 - QUBO.
 - SPSA.
 
-Pendência real:
+Também foram incorporados artigos EBSCO sobre:
 
-- Buscar 2 a 4 artigos recentes na EBSCO se o orientador quiser uma revisão de literatura mais atual.
+- VQA/QAOA para otimização combinatória.
+- SVM como QUBO em classificação binária.
+- Pré-processamento em QML.
+- VQCs em alta dimensionalidade.
+- Otimizadores em QML.
+- Limitações de hardware real e sensibilidade de VQCs.
 
-Buscas prioritárias:
+Pendência residual:
+
+- Buscar artigos adicionais somente se o orientador pedir uma referência ainda mais específica sobre QAOA aplicado diretamente à classificação supervisionada.
+
+Buscas futuras, se necessário:
 
 - `"QAOA" AND "classification"`
 - `"QUBO" AND "support vector machine"`

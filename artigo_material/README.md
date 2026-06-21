@@ -11,6 +11,7 @@ Esta pasta concentra o que precisa estar pronto antes de escrever o artigo no te
 - `plano-experimentos.md`: o que executar para gerar resultados rastreaveis.
 - `inventario-dados.md`: quais dados, tabelas e graficos serao necessarios.
 - `decisoes-artigo.md`: decisões assumidas para avançar o artigo sem depender de novas buscas ou execuções pesadas.
+- `triagem-ebsco.md`: seleção dos artigos EBSCO que entraram no artigo e justificativa dos descartes.
 
 ## Regra de trabalho
 
