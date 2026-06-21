@@ -25,7 +25,7 @@
 \maketitle
 
 \begin{resumo}
-Este trabalho investiga a viabilidade de utilizar formulações de otimização discreta associadas ao algoritmo QAOA em tarefas de classificação supervisionada, utilizando simuladores quânticos e comparação com métodos clássicos. A metodologia adotou o conjunto de dados \textit{breast cancer} da biblioteca \textit{scikit-learn}, com separação estratificada entre treino e teste, normalização, redução de dimensionalidade por PCA e avaliação por acurácia e tempo de execução. Inicialmente, foi estabelecido um baseline com SVM linear e VQC simulado. Em seguida, foi implementada uma formulação QUBO simplificada de classificador linear discretizado, resolvida por QAOA em instâncias pequenas e por solução exata em uma análise preliminar de escalabilidade. Os resultados indicaram que o baseline VQC atingiu 83,33\% de acurácia, enquanto o SVM clássico atingiu 100,00\%. Na etapa QUBO/QAOA, a instância com 2 componentes PCA obteve 90,00\% de acurácia com QAOA, porém com tempo superior ao SVM. O aumento no número de variáveis binárias elevou significativamente o custo computacional, reforçando as limitações práticas de simulação clássica de algoritmos quânticos variacionais.
+Este trabalho investiga o uso de QAOA com formulação QUBO em uma tarefa de classificação supervisionada simulada. Nos testes com a base \textit{breast cancer}, a abordagem atingiu 90,00\% de acurácia em pequena escala, mas apresentou custo superior ao SVM clássico.
 \end{resumo}
 
 \begin{justify}
@@ -33,7 +33,7 @@ Este trabalho investiga a viabilidade de utilizar formulações de otimização 
 \end{justify}
 
 \begin{abstract1}
-This work investigates the feasibility of using discrete optimization formulations associated with the QAOA algorithm in supervised classification tasks, using quantum simulators and comparison with classical methods. The methodology used the \textit{breast cancer} dataset from \textit{scikit-learn}, with stratified train-test split, normalization, dimensionality reduction through PCA, and evaluation by accuracy and execution time. First, a baseline was established with a linear SVM and a simulated VQC. Then, a simplified QUBO formulation of a discretized linear classifier was implemented and solved with QAOA in small instances and with an exact solver in a preliminary scalability analysis. The results indicated that the VQC baseline reached 83.33\% accuracy, while the classical SVM reached 100.00\%. In the QUBO/QAOA stage, the instance with 2 PCA components achieved 90.00\% accuracy with QAOA, although with higher execution time than SVM. Increasing the number of binary variables significantly increased computational cost, reinforcing the practical limitations of classical simulation of variational quantum algorithms.
+This work investigates QAOA with a QUBO formulation in a simulated supervised classification task. In tests with the \textit{breast cancer} dataset, the approach reached 90.00\% accuracy in a small-scale instance, but required higher execution time than the classical SVM baseline.
 \end{abstract1}
 
 \begin{justify}
