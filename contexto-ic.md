@@ -72,7 +72,7 @@ A conversão de problemas de classificação supervisionada para formulações Q
 
 **Status:** Concluída.
 **Objetivo Prático:** Traduzir a tarefa de classificação binária para o paradigma combinatório via QUBO (Quadratic Unconstrained Binary Optimization) e resolver via QAOA e solver exato.
-- **Implementação:** Arquivo `script_qaoa.py` integrando `qiskit_optimization`, discretização de coeficientes lineares e ansatz variacional.
+- **Implementação:** Arquivo `experimentos/script_qaoa.py` integrando `qiskit_optimization`, discretização de coeficientes lineares e ansatz variacional.
 - **Resultados validados:** Registro detalhado nos relatórios `testes/teste-04-qubo.md` e `testes/teste-05-qaoa-inicial.md`. Acurácia de 90,00% obtida com 2 componentes PCA em 3,70 s.
 
 #### Fase 3: Pipeline de Estresse e Coleta de Dados
@@ -89,9 +89,9 @@ A conversão de problemas de classificação supervisionada para formulações Q
 
 **Status:** Concluída.
 **Objetivo Prático:** Adequar o relatório científico às normas e estilos do novo template de Resumo Expandido UniSENAI 2026 (Word e PDF).
-- **Template DOCX Base:** `conversao/Template_ResumoExpandido2026.6bced2c68d504ba99fc5.docx`.
-- **Compilador DOCX Nativo:** `conversao/gerar_resumo_expandido.py` gerando `conversao/Resumo_Expandido_Julio_Regino_2026.docx`.
-- **Compilador PDF Nativo:** `conversao/gerar_resumo_expandido_pdf.py` gerando `conversao/Resumo_Expandido_Julio_Regino_2026.pdf`.
+- **Template DOCX Base:** `publicacao/templates/Template_ResumoExpandido2026.docx`.
+- **Compilador DOCX Nativo:** `publicacao/geradores/gerar_resumo_expandido.py` gerando `publicacao/dist/Resumo_Expandido_Julio_Regino_2026.docx`.
+- **Compilador PDF Nativo:** `publicacao/geradores/gerar_resumo_expandido_pdf.py` gerando `publicacao/dist/Resumo_Expandido_Julio_Regino_2026.pdf`.
 - **Identidade Visual:** Cunha vermelha superior direita (`#F9131E`), faixa trapezoidal cinza inferior (`#EBEBEB`) e logotipo oficial do SENAI vetorizado no rodapé.
 
 #### Fase 5: Refinamento Textual e Descontaminação de Padrões de IA
@@ -132,23 +132,22 @@ Para retomar o desenvolvimento deste projeto em uma nova máquina ou ambiente de
 3. **Regeneração dos Documentos Científicos (DOCX e PDF):**
    Os scripts utilizam apenas a biblioteca padrão do Python (`zipfile`, `zlib`, `struct`), sem necessidade de dependências pesadas adicionais:
    ```bash
-   # Compilação do Resumo Expandido em Word
-   python3 conversao/gerar_resumo_expandido.py
+   # Compilação do Resumo Expandido (5 páginas)
+   python3 publicacao/geradores/gerar_resumo_expandido.py
+   python3 publicacao/geradores/gerar_resumo_expandido_pdf.py
 
-   # Compilação do Resumo Expandido em PDF com layout oficial
-   python3 conversao/gerar_resumo_expandido_pdf.py
+   # Compilação da Versão Completa da Pesquisa (7 páginas)
+   python3 publicacao/geradores/gerar_artigo_completo_docx.py
+   python3 publicacao/geradores/gerar_artigo_completo_pdf.py
    ```
 
 4. **Estrutura dos Arquivos Principais:**
-   - `conversao/Resumo_Expandido_Julio_Regino_2026.docx`: Artigo formatado pronto para envio.
-   - `conversao/Resumo_Expandido_Julio_Regino_2026.pdf`: PDF compilado para conferência visual imediata.
-   - `script.py`: Pipeline do baseline clássico (SVM) e quântico variacional (VQC).
-   - `script_qaoa.py`: Pipeline de formulação QUBO, QAOA e solver exato por força bruta.
-   - `gerar_graficos.py`: Script gerador dos gráficos de acurácia e tempo.
-   - `resultados/`: Arquivos CSV com as medições empíricas brutas.
+   - `publicacao/dist/`: Documentos finais oficiais formatados para entrega.
+   - `publicacao/geradores/`: Scripts geradores dos documentos em PDF e Word.
+   - `publicacao/templates/`: Ativos gráficos e arquivo modelo institucional.
+   - `experimentos/script.py`: Pipeline do baseline clássico (SVM) e quântico variacional (VQC).
+   - `experimentos/script_qaoa.py`: Pipeline de formulação QUBO, QAOA e solver exato por força bruta.
+   - `experimentos/gerar_graficos.py`: Script gerador dos gráficos de acurácia e tempo.
+   - `resultados/`: Arquivos CSV com as medições empíricas brutas e figuras vetoriais.
    - `testes/`: Relatórios detalhados de cada bateria experimental executada.
 
-5. **Próximas Demandas Acadêmicas Sugeridas:**
-   - Submissão do resumo expandido ao comitê do evento UniSENAI 2026.
-   - Expansão do experimento para validação cruzada (*k-fold*) em conjuntos amostrais maiores (evitando sobreajuste em amostras pequenas).
-   - Investigação de formulações baseadas no problema dual do SVM mapeado diretamente para matrizes QUBO.

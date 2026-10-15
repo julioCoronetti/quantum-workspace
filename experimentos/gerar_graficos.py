@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Tuple
 
 
-RESULTS_DIR = Path("resultados")
+RESULTS_DIR = Path(__file__).resolve().parent.parent / "resultados"
 
 
 def read_csv(path: Path) -> List[Dict[str, str]]:

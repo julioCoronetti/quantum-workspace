@@ -12,13 +12,18 @@ from qiskit.primitives import StatevectorSampler
 from qiskit_algorithms import QAOA
 from qiskit_algorithms.optimizers import COBYLA, SPSA
 from qiskit_optimization import QuadraticProgram
-from qiskit_optimization.algorithms import MinimumEigenOptimizer
-from sklearn.metrics import accuracy_score
+import sys
+from pathlib import Path
+
+EXPERIMENTOS_DIR = Path(__file__).resolve().parent
+ROOT_DIR = EXPERIMENTOS_DIR.parent
+if str(EXPERIMENTOS_DIR) not in sys.path:
+    sys.path.insert(0, str(EXPERIMENTOS_DIR))
 
 from script import load_and_preprocess, set_qiskit_seed, train_classic
 
 
-DEFAULT_OUTPUT = "resultados/resultados_qaoa_pca.csv"
+DEFAULT_OUTPUT = str(ROOT_DIR / "resultados" / "resultados_qaoa_pca.csv")
 
 
 @dataclass
