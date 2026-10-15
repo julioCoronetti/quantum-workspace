@@ -15,7 +15,7 @@ quantum-workspace/
 │   ├── script_qaoa.py     # Fases 2 e 3: QUBO linear, QAOA e Solver Exato
 │   └── gerar_graficos.py  # Geração das figuras vetoriais SVG
 ├── resultados/            # Dados empíricos brutos (.csv) e figuras (.svg)
-├── publicacao/            # Manuscritos e editoração científica
+├── publicação/            # Manuscritos e editoração científica
 │   ├── dist/              # Entregáveis finais (PDFs e DOCXs oficiais)
 │   ├── geradores/         # Compiladores autônomos Python
 │   ├── templates/         # Ativos gráficos e template institucional UniSENAI 2026
@@ -61,16 +61,16 @@ python3 experimentos/gerar_graficos.py
 
 ## Compilação dos Documentos da Publicação
 
-Os entregáveis finais são compilados de forma autônoma na pasta `publicacao/dist/`:
+Os entregáveis finais são compilados de forma autônoma na pasta `publicação/dist/`:
 
 ### Resumo Expandido (Submissão Oficial - 5 páginas)
 ```bash
-python3 publicacao/geradores/gerar_resumo_expandido_pdf.py
-python3 publicacao/geradores/gerar_resumo_expandido.py
+python3 publicação/geradores/gerar_resumo_expandido_pdf.py
+python3 publicação/geradores/gerar_resumo_expandido.py
 ```
 
 ### Versão Completa da Pesquisa (Memória Técnica - 7 páginas)
 ```bash
-python3 publicacao/geradores/gerar_artigo_completo_pdf.py
-python3 publicacao/geradores/gerar_artigo_completo_docx.py
+python3 publicação/geradores/gerar_artigo_completo_pdf.py
+python3 publicação/geradores/gerar_artigo_completo_docx.py
 ```

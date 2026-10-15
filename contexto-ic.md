@@ -89,9 +89,9 @@ A conversão de problemas de classificação supervisionada para formulações Q
 
 **Status:** Concluída.
 **Objetivo Prático:** Adequar o relatório científico às normas e estilos do novo template de Resumo Expandido UniSENAI 2026 (Word e PDF).
-- **Template DOCX Base:** `publicacao/templates/Template_ResumoExpandido2026.docx`.
-- **Compilador DOCX Nativo:** `publicacao/geradores/gerar_resumo_expandido.py` gerando `publicacao/dist/Resumo_Expandido_Julio_Regino_2026.docx`.
-- **Compilador PDF Nativo:** `publicacao/geradores/gerar_resumo_expandido_pdf.py` gerando `publicacao/dist/Resumo_Expandido_Julio_Regino_2026.pdf`.
+- **Template DOCX Base:** `publicação/templates/Template_ResumoExpandido2026.docx`.
+- **Compilador DOCX Nativo:** `publicação/geradores/gerar_resumo_expandido.py` gerando `publicação/dist/Resumo_Expandido_Julio_Regino_2026.docx`.
+- **Compilador PDF Nativo:** `publicação/geradores/gerar_resumo_expandido_pdf.py` gerando `publicação/dist/Resumo_Expandido_Julio_Regino_2026.pdf`.
 - **Identidade Visual:** Cunha vermelha superior direita (`#F9131E`), faixa trapezoidal cinza inferior (`#EBEBEB`) e logotipo oficial do SENAI vetorizado no rodapé.
 
 #### Fase 5: Refinamento Textual e Descontaminação de Padrões de IA
@@ -133,18 +133,18 @@ Para retomar o desenvolvimento deste projeto em uma nova máquina ou ambiente de
    Os scripts utilizam apenas a biblioteca padrão do Python (`zipfile`, `zlib`, `struct`), sem necessidade de dependências pesadas adicionais:
    ```bash
    # Compilação do Resumo Expandido (5 páginas)
-   python3 publicacao/geradores/gerar_resumo_expandido.py
-   python3 publicacao/geradores/gerar_resumo_expandido_pdf.py
+   python3 publicação/geradores/gerar_resumo_expandido.py
+   python3 publicação/geradores/gerar_resumo_expandido_pdf.py
 
    # Compilação da Versão Completa da Pesquisa (7 páginas)
-   python3 publicacao/geradores/gerar_artigo_completo_docx.py
-   python3 publicacao/geradores/gerar_artigo_completo_pdf.py
+   python3 publicação/geradores/gerar_artigo_completo_docx.py
+   python3 publicação/geradores/gerar_artigo_completo_pdf.py
    ```
 
 4. **Estrutura dos Arquivos Principais:**
-   - `publicacao/dist/`: Documentos finais oficiais formatados para entrega.
-   - `publicacao/geradores/`: Scripts geradores dos documentos em PDF e Word.
-   - `publicacao/templates/`: Ativos gráficos e arquivo modelo institucional.
+   - `publicação/dist/`: Documentos finais oficiais formatados para entrega.
+   - `publicação/geradores/`: Scripts geradores dos documentos em PDF e Word.
+   - `publicação/templates/`: Ativos gráficos e arquivo modelo institucional.
    - `experimentos/script.py`: Pipeline do baseline clássico (SVM) e quântico variacional (VQC).
    - `experimentos/script_qaoa.py`: Pipeline de formulação QUBO, QAOA e solver exato por força bruta.
    - `experimentos/gerar_graficos.py`: Script gerador dos gráficos de acurácia e tempo.
