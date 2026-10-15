@@ -70,33 +70,85 @@ A conversão de problemas de classificação supervisionada para formulações Q
 
 #### Fase 2: O Coração da IC (Implementando o QAOA)
 
-**Status:** Próxima fase.
-
-**Objetivo Prático:** Traduzir a classificação em otimização. O QAOA não roda classificação nativamente; ele precisa ler o problema matematicamente de outra forma.
-
-- **Pesquisa:** Estudar o conceito de QUBO (Quadratic Unconstrained Binary Optimization). Pesquisar especificamente pelo termo *"How to map SVM to QUBO Qiskit"*.
-- **Experimento:** Usar a biblioteca `qiskit-optimization` para formular a classificação do dataset como um QUBO. Depois, substituir o `VQC` e o `RealAmplitudes` pelo `QAOAAnsatz`.
-- **Buscas no EBSCO (A Pesquisa Principal):** Artigos que mostrem como transformar um problema clássico de IA (SVM) em uma matriz matemática (QUBO) que o QAOA consiga ler.
-    - `"QAOA" AND ("Support Vector Machine" OR "SVM" OR "Classification")`
-    - `"QUBO" AND "Support Vector Machine" AND "Quantum"`
-    - `"Quantum Approximate Optimization Algorithm" AND "QUBO" AND "Machine Learning"`
+**Status:** Concluída.
+**Objetivo Prático:** Traduzir a tarefa de classificação binária para o paradigma combinatório via QUBO (Quadratic Unconstrained Binary Optimization) e resolver via QAOA e solver exato.
+- **Implementação:** Arquivo `script_qaoa.py` integrando `qiskit_optimization`, discretização de coeficientes lineares e ansatz variacional.
+- **Resultados validados:** Registro detalhado nos relatórios `testes/teste-04-qubo.md` e `testes/teste-05-qaoa-inicial.md`. Acurácia de 90,00% obtida com 2 componentes PCA em 3,70 s.
 
 #### Fase 3: Pipeline de Estresse e Coleta de Dados
 
-**Objetivo Prático:** Gerar os dados finais e as métricas para a criação dos gráficos que irão compor o artigo.
+**Status:** Concluída.
+**Objetivo Prático:** Avaliar a escalabilidade temporal e combinatória do modelo variando os componentes do PCA de 2 a 5.
+- **Implementação:** Experimentos automatizados salvos em `resultados/resultados_qaoa_pca.csv` e `resultados/resultados_qubo_exato_pca.csv`.
+- **Geração de Gráficos:** Script `gerar_graficos.py` gerando gráficos vetoriais em `resultados/`.
+- **Métricas consolidadas:**
+  - Solver exato: acurácia constante em 90,00%, tempo escalando de 0,08 s (6 variáveis) a 7,15 s (12 variáveis).
+  - QAOA simulado: acurácia de 90,00% (PCA=2, 3,70 s), 90,00% (PCA=3, 41,71 s) e 96,67% (PCA=4, 863,42 s com `maxiter=5`).
 
-- **Pesquisa:** Entender a relação exponencial entre o número de features (colunas do dataset) e a exigência de memória RAM/processamento do simulador quântico.
-- **Experimento:** Criar um script com um loop que roda o QAOA variando as features do PCA (2, 3, 4 e 5). Salvar automaticamente os resultados (Tempo Clássico, Tempo Quântico, Acurácia Clássica, Acurácia Quântica) em um arquivo `.csv`.
-- **Buscas no EBSCO (Munição para Discussão):** Provar cientificamente que a lentidão no processamento (ex: o tempo de 1.64s do primeiro teste) é uma limitação arquitetural de simuladores e hardwares atuais, e não um erro do código.
-    - `"Quantum Simulator" AND "performance" AND ("scaling" OR "qubits")`
-    - `("PCA" OR "feature reduction") AND "Quantum Machine Learning" AND "limitations"`
+#### Fase 4: Conversão para Template Oficial UniSENAI 2026
 
-#### Fase 4: Redação no Template
+**Status:** Concluída.
+**Objetivo Prático:** Adequar o relatório científico às normas e estilos do novo template de Resumo Expandido UniSENAI 2026 (Word e PDF).
+- **Template DOCX Base:** `conversao/Template_ResumoExpandido2026.6bced2c68d504ba99fc5.docx`.
+- **Compilador DOCX Nativo:** `conversao/gerar_resumo_expandido.py` gerando `conversao/Resumo_Expandido_Julio_Regino_2026.docx`.
+- **Compilador PDF Nativo:** `conversao/gerar_resumo_expandido_pdf.py` gerando `conversao/Resumo_Expandido_Julio_Regino_2026.pdf`.
+- **Identidade Visual:** Cunha vermelha superior direita (`#F9131E`), faixa trapezoidal cinza inferior (`#EBEBEB`) e logotipo oficial do SENAI vetorizado no rodapé.
 
-**Objetivo Prático:** Transformar os logs de dados e anotações no documento científico final formatado.
+#### Fase 5: Refinamento Textual e Descontaminação de Padrões de IA
 
-- **Pesquisa:** Buscar 3 ou 4 artigos recentes (de 2023 para cá) sobre aplicações práticas para usar na "Revisão de Literatura".
-- **Ação:** Preencher a estrutura do artigo utilizando o template `main.tex`. Usar o `.csv` da Fase 3 para gerar gráficos de barra (Tempo vs. Features) e colocá-los na seção de "Resultados e Discussões".
-- **Buscas no EBSCO (Contexto da Introdução):** Artigos mais amplos para dar peso acadêmico logo no início do texto, estabelecendo que o QAOA é o estado da arte para computadores quânticos de curto prazo (era NISQ).
-    - `"QAOA" AND "supervised learning"`
-    - `"Quantum Machine Learning" AND "NISQ era" AND "Classification"`
+**Status:** Concluída em 2026-10-15.
+**Objetivo Prático:** Eliminar traços sintéticos de geração automatizada, clichês de linguagem e inconsistências metodológicas apontadas em análise externa.
+- **Ajustes de Redação:**
+  - Eliminação de construções repetitivas da fórmula "não X, mas Y".
+  - Reestruturação da Revisão de Literatura para abordagem direta do estado da arte e autores, removendo moldes de meta-justificação a cada parágrafo.
+  - Redução drástica de anafóricos mecânicos ("Esse/Essa + substantivo") e menções redundantes a "NISQ".
+  - Substituição de vocabulário inflado ("restrições severas", "desafio crítico", "etapa crítica", "trade-off") por terminologia técnica sóbria.
+- **Consistência Científica e Metodológica:**
+  - Esclarecimento analítico da acurácia de 96,67% do QAOA (PCA=4) vs 90,00% do solver exato: decorrente de discretização limítrofe sobre partição reduzida de teste (30 instâncias), caracterizando flutuação amostral.
+  - Substituição de termos de jargão de código por notação matemática formal.
+  - Padronização institucional de afiliação e biografia: Faculdade de Tecnologia SENAI Gaspar Ricardo Júnior.
+  - Correção tipográfica do título da Seção 3: `3 METODOLOGIA`.
+
+---
+
+## Guia para Continuidade em Outro Ambiente
+
+Para retomar o desenvolvimento deste projeto em uma nova máquina ou ambiente de desenvolvimento:
+
+1. **Clonagem do Repositório:**
+   ```bash
+   git clone https://github.com/julioCoronetti/quantum-workspace.git
+   cd quantum-workspace
+   git checkout main
+   ```
+
+2. **Configuração do Ambiente Virtual Python:**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+3. **Regeneração dos Documentos Científicos (DOCX e PDF):**
+   Os scripts utilizam apenas a biblioteca padrão do Python (`zipfile`, `zlib`, `struct`), sem necessidade de dependências pesadas adicionais:
+   ```bash
+   # Compilação do Resumo Expandido em Word
+   python3 conversao/gerar_resumo_expandido.py
+
+   # Compilação do Resumo Expandido em PDF com layout oficial
+   python3 conversao/gerar_resumo_expandido_pdf.py
+   ```
+
+4. **Estrutura dos Arquivos Principais:**
+   - `conversao/Resumo_Expandido_Julio_Regino_2026.docx`: Artigo formatado pronto para envio.
+   - `conversao/Resumo_Expandido_Julio_Regino_2026.pdf`: PDF compilado para conferência visual imediata.
+   - `script.py`: Pipeline do baseline clássico (SVM) e quântico variacional (VQC).
+   - `script_qaoa.py`: Pipeline de formulação QUBO, QAOA e solver exato por força bruta.
+   - `gerar_graficos.py`: Script gerador dos gráficos de acurácia e tempo.
+   - `resultados/`: Arquivos CSV com as medições empíricas brutas.
+   - `testes/`: Relatórios detalhados de cada bateria experimental executada.
+
+5. **Próximas Demandas Acadêmicas Sugeridas:**
+   - Submissão do resumo expandido ao comitê do evento UniSENAI 2026.
+   - Expansão do experimento para validação cruzada (*k-fold*) em conjuntos amostrais maiores (evitando sobreajuste em amostras pequenas).
+   - Investigação de formulações baseadas no problema dual do SVM mapeado diretamente para matrizes QUBO.
