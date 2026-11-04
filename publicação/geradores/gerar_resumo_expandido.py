@@ -1,12 +1,12 @@
 import zipfile
 import xml.etree.ElementTree as ET
 import os
-
 from pathlib import Path
-BASE_DIR = Path(__file__).resolve().parent.parent
 
+BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_PATH = str(BASE_DIR / "templates" / "Template_ResumoExpandido2026.docx")
 OUTPUT_PATH = str(BASE_DIR / "dist" / "Resumo_Expandido_Julio_Regino_2026.docx")
+DIST_PATH = str(BASE_DIR / "revisao" / "Resumo_Expandido_Julio_Regino_2026_Revisado.docx")
 
 def escape_xml(text):
     return (text.replace('&', '&amp;')
@@ -15,7 +15,7 @@ def escape_xml(text):
                 .replace('"', '&quot;')
                 .replace("'", '&apos;'))
 
-def make_run(text, bold=False, italic=False, font_size=24, font_name="Arial"):
+def make_run(text, bold=False, italic=False, font_size=21, font_name="Arial", vert_align=None):
     rPr = []
     rPr.append(f'<w:rFonts w:ascii="{font_name}" w:hAnsi="{font_name}" w:cs="{font_name}"/>')
     if bold:
@@ -23,11 +23,13 @@ def make_run(text, bold=False, italic=False, font_size=24, font_name="Arial"):
     if italic:
         rPr.append('<w:i/><w:iCs/>')
     rPr.append(f'<w:sz w:val="{font_size}"/><w:szCs w:val="{font_size}"/>')
+    if vert_align:
+        rPr.append(f'<w:vertAlign w:val="{vert_align}"/>')
     rPr.append('<w:lang w:val="pt-BR"/>')
     rPr_xml = f"<w:rPr>{''.join(rPr)}</w:rPr>"
     return f'<w:r>{rPr_xml}<w:t xml:space="preserve">{escape_xml(text)}</w:t></w:r>'
 
-def make_p(runs, jc="both", first_line=708, space_after=100, line_spacing=300, pStyle=None, numPr=None, keepNext=False):
+def make_p(runs, jc="both", first_line=708, space_after=80, space_before=None, line_spacing=260, pStyle=None, numPr=None, keepNext=False):
     pPr = []
     if pStyle:
         pPr.append(f'<w:pStyle w:val="{pStyle}"/>')
@@ -45,6 +47,8 @@ def make_p(runs, jc="both", first_line=708, space_after=100, line_spacing=300, p
         pPr.append(f'<w:ind {" ".join(ind_attrs)}/>')
         
     sp_attrs = []
+    if space_before is not None:
+        sp_attrs.append(f'w:before="{space_before}"')
     if space_after is not None:
         sp_attrs.append(f'w:after="{space_after}"')
     if line_spacing:
@@ -56,13 +60,76 @@ def make_p(runs, jc="both", first_line=708, space_after=100, line_spacing=300, p
     runs_xml = ''.join(runs)
     return f'<w:p>{pPr_xml}{runs_xml}</w:p>'
 
-def make_heading_1(text, num=True, num_val="2"):
+def make_heading_1(text, num=True, num_val="2", space_before=200, space_after=100):
     num_xml = f'<w:numPr><w:ilvl w:val="0"/><w:numId w:val="{num_val}"/></w:numPr>' if num else ''
-    r = make_run(text, bold=True, font_size=24, font_name="Arial")
-    return make_p([r], jc="both", first_line=0, space_after=120, line_spacing=300, pStyle="Ttulo1", numPr=num_xml, keepNext=True)
+    r = make_run(text, bold=True, font_size=23, font_name="Arial")
+    return make_p([r], jc="both", first_line=0, space_before=space_before, space_after=space_after, line_spacing=280, pStyle="Ttulo1", numPr=num_xml, keepNext=True)
+
+def make_equation():
+    return (
+        '<w:p>'
+        '<w:pPr><w:jc w:val="center"/><w:spacing w:before="120" w:after="120"/></w:pPr>'
+        '<m:oMathPara><m:oMath>'
+        '<m:r><m:t>H(b, w) = </m:t></m:r>'
+        '<m:f><m:fPr><m:type m:val="bar"/></m:fPr><m:num><m:r><m:t>1</m:t></m:r></m:num><m:den><m:r><m:t>N</m:t></m:r></m:den></m:f>'
+        '<m:nary>'
+        '<m:naryPr><m:chr m:val="∑"/><m:limLoc m:val="undOvr"/></m:naryPr>'
+        '<m:sub><m:r><m:t>i=1</m:t></m:r></m:sub>'
+        '<m:sup><m:r><m:t>N</m:t></m:r></m:sup>'
+        '<m:e>'
+        '<m:sSup>'
+        '<m:e>'
+        '<m:d><m:dPr><m:begChr m:val="("/><m:endChr m:val=")"/></m:dPr><m:e>'
+        '<m:r><m:t>b + </m:t></m:r>'
+        '<m:nary>'
+        '<m:naryPr><m:chr m:val="∑"/><m:limLoc m:val="undOvr"/></m:naryPr>'
+        '<m:sub><m:r><m:t>j=1</m:t></m:r></m:sub>'
+        '<m:sup><m:r><m:t>d</m:t></m:r></m:sup>'
+        '<m:e>'
+        '<m:sSub><m:e><m:r><m:t>x</m:t></m:r></m:e><m:sub><m:r><m:t>ij</m:t></m:r></m:sub></m:sSub>'
+        '<m:sSub><m:e><m:r><m:t>w</m:t></m:r></m:e><m:sub><m:r><m:t>j</m:t></m:r></m:sub></m:sSub>'
+        '</m:e>'
+        '</m:nary>'
+        '<m:r><m:t> - </m:t></m:r>'
+        '<m:sSub><m:e><m:r><m:t>y</m:t></m:r></m:e><m:sub><m:r><m:t>i</m:t></m:r></m:sub></m:sSub>'
+        '</m:e></m:d>'
+        '</m:e>'
+        '<m:sup><m:r><m:t>2</m:t></m:r></m:sup>'
+        '</m:sSup>'
+        '</m:e>'
+        '</m:nary>'
+        '<m:r><m:t> + </m:t></m:r>'
+        '<m:sSub><m:e><m:r><m:t>λ</m:t></m:r></m:e><m:sub><m:r><m:t>reg</m:t></m:r></m:sub></m:sSub>'
+        '<m:d><m:dPr><m:begChr m:val="("/><m:endChr m:val=")"/></m:dPr><m:e>'
+        '<m:sSup><m:e><m:r><m:t>b</m:t></m:r></m:e><m:sup><m:r><m:t>2</m:t></m:r></m:sup></m:sSup>'
+        '<m:r><m:t> + </m:t></m:r>'
+        '<m:nary>'
+        '<m:naryPr><m:chr m:val="∑"/><m:limLoc m:val="undOvr"/></m:naryPr>'
+        '<m:sub><m:r><m:t>j=1</m:t></m:r></m:sub>'
+        '<m:sup><m:r><m:t>d</m:t></m:r></m:sup>'
+        '<m:e>'
+        '<m:sSubSup><m:e><m:r><m:t>w</m:t></m:r></m:e><m:sub><m:r><m:t>j</m:t></m:r></m:sub><m:sup><m:r><m:t>2</m:t></m:r></m:sup></m:sSubSup>'
+        '</m:e>'
+        '</m:nary>'
+        '</m:e></m:d>'
+        '<m:r><m:t> + </m:t></m:r>'
+        '<m:sSub><m:e><m:r><m:t>λ</m:t></m:r></m:e><m:sub><m:r><m:t>mut</m:t></m:r></m:sub></m:sSub>'
+        '<m:nary>'
+        '<m:naryPr><m:chr m:val="∑"/><m:limLoc m:val="undOvr"/></m:naryPr>'
+        '<m:sub><m:r><m:t>k=0</m:t></m:r></m:sub>'
+        '<m:sup><m:r><m:t>d</m:t></m:r></m:sup>'
+        '<m:e>'
+        '<m:sSubSup><m:e><m:r><m:t>b</m:t></m:r></m:e><m:sub><m:r><m:t>k</m:t></m:r></m:sub><m:sup><m:r><m:t>(+)</m:t></m:r></m:sup></m:sSubSup>'
+        '<m:sSubSup><m:e><m:r><m:t>b</m:t></m:r></m:e><m:sub><m:r><m:t>k</m:t></m:r></m:sub><m:sup><m:r><m:t>(-)</m:t></m:r></m:sup></m:sSubSup>'
+        '</m:e>'
+        '</m:nary>'
+        '<m:r><m:t>            (1)</m:t></m:r>'
+        '</m:oMath></m:oMathPara>'
+        '</w:p>'
+    )
 
 def make_table(headers, rows, caption_text):
-    caption = make_p([make_run(caption_text, bold=True, font_size=20)], jc="both", first_line=0, space_after=50, line_spacing=240, keepNext=True)
+    caption = make_p([make_run(caption_text, bold=True, font_size=19)], jc="both", first_line=0, space_before=160, space_after=60, line_spacing=220, keepNext=True)
     
     tbl_xml = []
     tbl_xml.append('<w:tbl>')
@@ -86,7 +153,7 @@ def make_table(headers, rows, caption_text):
         tbl_xml.append('<w:tcPr>')
         tbl_xml.append('<w:tcBorders><w:bottom w:val="single" w:sz="6" w:space="0" w:color="000000"/></w:tcBorders>')
         tbl_xml.append('</w:tcPr>')
-        p = make_p([make_run(h, bold=True, font_size=19)], jc="center", first_line=0, space_after=30, line_spacing=220)
+        p = make_p([make_run(h, bold=True, font_size=18)], jc="center", first_line=0, space_after=25, line_spacing=210)
         tbl_xml.append(p)
         tbl_xml.append('</w:tc>')
     tbl_xml.append('</w:tr>')
@@ -96,14 +163,14 @@ def make_table(headers, rows, caption_text):
         for idx, cell in enumerate(row):
             tbl_xml.append('<w:tc>')
             jc = "left" if idx == 0 and len(cell) > 5 else "center"
-            p = make_p([make_run(cell, bold=False, font_size=19)], jc=jc, first_line=0, space_after=25, line_spacing=220)
+            p = make_p([make_run(cell, bold=False, font_size=18)], jc=jc, first_line=0, space_after=20, line_spacing=210)
             tbl_xml.append(p)
             tbl_xml.append('</w:tc>')
         tbl_xml.append('</w:tr>')
         
     tbl_xml.append('</w:tbl>')
     
-    space_after_tbl = make_p([make_run("", font_size=12)], jc="both", first_line=0, space_after=80, line_spacing=200)
+    space_after_tbl = make_p([make_run("", font_size=10)], jc="both", first_line=0, space_after=50, line_spacing=180)
     return caption + ''.join(tbl_xml) + space_after_tbl
 
 def build_footnotes_xml():
@@ -119,14 +186,14 @@ def build_footnotes_xml():
     <w:p>
       <w:pPr><w:pStyle w:val="Textodenotaderodap"/></w:pPr>
       <w:r><w:rPr><w:rStyle w:val="Refdenotaderodap"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr><w:footnoteRef/></w:r>
-      <w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr><w:t xml:space="preserve"> Discente, Faculdade de Tecnologia SENAI Gaspar Ricardo Júnior, julio.regino2@senaisp.edu.br.</w:t></w:r>
+      <w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="19"/><w:szCs w:val="19"/></w:rPr><w:t xml:space="preserve"> Discente, Faculdade de Tecnologia SENAI Gaspar Ricardo Júnior, julio.regino2@senaisp.edu.br.</w:t></w:r>
     </w:p>
   </w:footnote>
   <w:footnote w:id="2">
     <w:p>
       <w:pPr><w:pStyle w:val="Textodenotaderodap"/></w:pPr>
       <w:r><w:rPr><w:rStyle w:val="Refdenotaderodap"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr><w:footnoteRef/></w:r>
-      <w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr><w:t xml:space="preserve"> Docente, Faculdade de Tecnologia SENAI Gaspar Ricardo Júnior, caina.silva@sp.senai.br.</w:t></w:r>
+      <w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="19"/><w:szCs w:val="19"/></w:rPr><w:t xml:space="preserve"> Docente, Faculdade de Tecnologia SENAI Gaspar Ricardo Júnior, caina.silva@sp.senai.br.</w:t></w:r>
     </w:p>
   </w:footnote>
 </w:footnotes>'''
@@ -135,115 +202,290 @@ def build_document_xml():
     body_elements = []
 
     body_elements.append(make_p(
-        [make_run("EXPLORAÇÃO DO ALGORITMO QAOA PARA OTIMIZAÇÃO EM MODELOS DE CLASSIFICAÇÃO SUPERVISIONADA UTILIZANDO SIMULADORES QUÂNTICOS", bold=True, font_size=24)],
-        jc="center", first_line=0, space_after=100, line_spacing=260
+        [make_run("EXPLORAÇÃO DO ALGORITMO QAOA PARA OTIMIZAÇÃO EM MODELOS DE CLASSIFICAÇÃO SUPERVISIONADA UTILIZANDO SIMULADORES QUÂNTICOS", bold=True, font_size=23)],
+        jc="center", first_line=0, space_after=80, line_spacing=250
     ))
     
     body_elements.append(make_p(
-        [make_run("EXPLORATION OF THE QAOA ALGORITHM FOR OPTIMIZATION IN SUPERVISED CLASSIFICATION MODELS USING QUANTUM SIMULATORS", bold=True, font_size=24)],
-        jc="center", first_line=0, space_after=180, line_spacing=260
+        [make_run("EXPLORATION OF THE QAOA ALGORITHM FOR OPTIMIZATION IN SUPERVISED CLASSIFICATION MODELS USING QUANTUM SIMULATORS", bold=True, font_size=23)],
+        jc="center", first_line=0, space_after=140, line_spacing=250
     ))
 
     author_runs = [
-        make_run("Julio Coronetti Regino", bold=True, font_size=24),
-        '<w:r><w:rPr><w:rStyle w:val="Refdenotaderodap"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:footnoteReference w:id="1"/></w:r>',
-        make_run(", ", bold=False, font_size=24),
-        make_run("Cainã Antunes", bold=True, font_size=24),
-        '<w:r><w:rPr><w:rStyle w:val="Refdenotaderodap"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:footnoteReference w:id="2"/></w:r>'
+        make_run("Julio Coronetti Regino", bold=True, font_size=22),
+        '<w:r><w:rPr><w:rStyle w:val="Refdenotaderodap"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="22"/><w:szCs w:val="22"/></w:rPr><w:footnoteReference w:id="1"/></w:r>',
+        make_run(", i, ", bold=False, font_size=22),
+        make_run("Cainã Antunes", bold=True, font_size=22),
+        '<w:r><w:rPr><w:rStyle w:val="Refdenotaderodap"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="22"/><w:szCs w:val="22"/></w:rPr><w:footnoteReference w:id="2"/></w:r>',
+        make_run(", ii", bold=False, font_size=22)
     ]
-    body_elements.append(make_p(author_runs, jc="both", first_line=0, space_after=180, line_spacing=260))
+    body_elements.append(make_p(author_runs, jc="both", first_line=0, space_after=140, line_spacing=250))
 
-    body_elements.append(make_p([make_run("RESUMO", bold=True, font_size=24)], jc="both", first_line=0, space_after=60, line_spacing=260))
-    resumo_text = ("Este trabalho avalia a formulação de tarefas de classificação supervisionada binária como problemas de Otimização Binária Quadrática Irrestrita (QUBO) e sua resolução pelo algoritmo QAOA em simuladores quânticos. O conjunto de dados breast cancer da biblioteca scikit-learn foi padronizado por escore Z, reduzido via PCA e reescalado para [0, 1], particionado com estratificação em 70% para treino e 30% para teste (seed 42). O classificador linear discretizado em variáveis binárias com penalização de norma e exclusão mútua de sinal foi confrontado com o SVM clássico e com o classificador variacional (VQC). Em instâncias com 2 componentes principais, o QAOA alcançou 90,00% de acurácia de teste em 3,70 s, contra 100,00% do SVM (0,0009 s) e 83,33% do VQC (12,81 s). A avaliação de escalabilidade até 5 componentes comprovou a estabilidade preditiva do modelo QUBO (90,00% exato), delimitando a barreira computacional da simulação clássica pelo crescimento exponencial do tempo de execução do QAOA.")
-    body_elements.append(make_p([make_run(resumo_text, font_size=23)], jc="both", first_line=0, space_after=60, line_spacing=260))
+    body_elements.append(make_p([make_run("RESUMO", bold=True, font_size=22)], jc="both", first_line=0, space_after=50, line_spacing=250))
+    resumo_runs = [
+        make_run("Este trabalho investiga a formulação da classificação supervisionada binária como um problema de Otimização Binária Quadrática Irrestrita (QUBO), resolvido via algoritmo QAOA em simuladores quânticos analíticos de vetores de estado. A partir de uma subamostra estratificada de 100 instâncias (37 da classe maligna e 63 da benigna) do conjunto breast cancer (scikit-learn), particionada em 70% para treino e 30% para teste, avaliou-se um classificador linear com pesos discretizados frente ao SVM linear clássico e ao classificador quântico variacional (VQC). Para prevenir rigorosamente qualquer vazamento de dados (data leakage), a padronização por escore Z, a Análise de Componentes Principais (PCA) e a normalização linear em [0, 1] foram ajustadas exclusivamente na partição de treinamento e aplicadas no teste. Enquanto o VQC treina as rotações de portas lógicas em um circuito quântico classificador, o QAOA otimiza os coeficientes discretizados de uma função de perda clássica mapeada para QUBO. Com 2 componentes PCA, tanto o solver exato quanto o QAOA convergiram para o mesmo valor ótimo de função objetivo (0,8736) no treino e registraram 90,00% de acurácia observada no teste (QAOA em 3,70 s, SVM em 0,0010 s e VQC em 12,81 s). A avaliação de escalabilidade abrangeu o QAOA de 2 a 4 componentes e o solver exato de 2 a 5 componentes. O QAOA manteve o custo ótimo em PCA = 3 (0,8736; 90,00%; 41,71 s) e obteve 96,67% em PCA = 4 (863,42 s) sobre uma solução subótima no treino (0,8764), cuja oscilação constitui hipótese de flutuação amostral decorrente da partição de teste reduzida. O solver exato alcançou 90,00% em PCA = 5 (7,15 s; 12 variáveis), confirmando a viabilidade representacional da modelagem e caracterizando os limites operacionais na simulação clássica de amplitudes quânticas.", font_size=21)
+    ]
+    body_elements.append(make_p(resumo_runs, jc="both", first_line=0, space_after=50, line_spacing=250))
     
-    kw_pt = [make_run("Palavras-chave: ", bold=True, font_size=23), make_run("QAOA; QUBO; classificação supervisionada; aprendizado de máquina quântico; simuladores quânticos.", font_size=23)]
-    body_elements.append(make_p(kw_pt, jc="both", first_line=0, space_after=140, line_spacing=260))
+    kw_pt = [make_run("Palavras-chave: ", bold=True, font_size=21), make_run("QAOA; QUBO; classificação supervisionada; aprendizado de máquina quântico; simuladores quânticos.", font_size=21)]
+    body_elements.append(make_p(kw_pt, jc="both", first_line=0, space_after=120, line_spacing=250))
 
-    body_elements.append(make_p([make_run("ABSTRACT", bold=True, font_size=24)], jc="both", first_line=0, space_after=60, line_spacing=260))
-    abstract_text = ("This study evaluates the formulation of binary supervised classification tasks as Quadratic Unconstrained Binary Optimization (QUBO) problems solved by the QAOA algorithm on quantum simulators. The breast cancer dataset was standardized, reduced via PCA, scaled to [0, 1], and partitioned with stratification into 70% training and 30% testing subsets. A discretized linear classifier with regularized binary weights and mutual sign exclusion was compared against classical SVM and simulated VQC baselines. For instances with 2 principal components, QAOA achieved 90.00% test accuracy in 3.70 s, compared to 100.00% for SVM (0.0009 s) and 83.33% for VQC (12.81 s). Scalability tests across 2 to 5 components confirmed the functional stability of the QUBO formulation while highlighting the computational bottleneck of classical state-vector simulation, which scales exponentially with the number of qubits.")
-    body_elements.append(make_p([make_run(abstract_text, italic=False, font_size=23)], jc="both", first_line=0, space_after=60, line_spacing=260))
+    body_elements.append(make_p([make_run("ABSTRACT", bold=True, font_size=22)], jc="both", first_line=0, space_after=50, line_spacing=250))
+    abstract_runs = [
+        make_run("This study investigates the formulation of binary supervised classification as a Quadratic Unconstrained Binary Optimization (QUBO) problem solved by the QAOA algorithm on quantum statevector simulators. Using a stratified subset of 100 instances (37 malignant, 63 benign) from the breast cancer dataset, partitioned into 70% training and 30% testing subsets, a discretized linear classifier was evaluated against classical linear SVM and simulated Variational Quantum Classifier (VQC) baselines. To strictly prevent data leakage, Z-score standardization, Principal Component Analysis (PCA), and [0, 1] min-max normalization were fitted exclusively on the training partition and applied to the test partition. While VQC adjusts parameterized gate rotations in a quantum circuit, QAOA optimizes the discretized coefficients of a classical quadratic loss mapped to QUBO. With 2 PCA components, both the exact solver and QAOA converged to the optimal objective function value (0.8736) on training, achieving 90.00% observed test accuracy (QAOA in 3.70 s, SVM in 0.0010 s, and VQC in 12.81 s). Scalability evaluation assessed QAOA from 2 to 4 components and the exact solver from 2 to 5 components. QAOA retained the optimal cost at PCA = 3 (0.8736; 90.00%; 41.71 s) and yielded 96.67% at PCA = 4 (863.42 s) with a suboptimal training cost (0.8764), hypothesized as a sample fluctuation on the small test partition. The exact solver reached 90.00% at PCA = 5 (7.15 s; 12 variables), demonstrating representational viability while characterizing the operational runtime bottleneck of classical statevector simulation.", italic=False, font_size=21)
+    ]
+    body_elements.append(make_p(abstract_runs, jc="both", first_line=0, space_after=50, line_spacing=250))
 
-    kw_en = [make_run("Keywords: ", bold=True, font_size=23), make_run("QAOA; QUBO; supervised classification; quantum machine learning; quantum simulators.", italic=False, font_size=23)]
-    body_elements.append(make_p(kw_en, jc="both", first_line=0, space_after=180, line_spacing=260))
+    kw_en = [make_run("Keywords: ", bold=True, font_size=21), make_run("QAOA; QUBO; supervised classification; quantum machine learning; quantum simulators.", italic=False, font_size=21)]
+    body_elements.append(make_p(kw_en, jc="both", first_line=0, space_after=160, line_spacing=250))
 
+    # 1 INTRODUÇÃO
     body_elements.append(make_heading_1("1 INTRODUÇÃO", num=False))
     body_elements.append(make_p([make_run(
-        "A computação quântica baseada em circuitos variacionais híbridos tem sido investigada para explorar novos modelos de otimização no regime de processadores com ruído e conectividade limitada (era NISQ). Embora modelos tradicionais de aprendizado supervisionado operem em espaços contínuos por otimização convexa, a representação de tarefas de classificação sob formalismos combinatórios discretos viabiliza sua execução em computadores quânticos através de matrizes de interação quadrática. Contudo, em plataformas clássicas de simulação por vetores de estado, a emulação das operações quânticas impõe custo de memória e tempo exponencialmente proporcional ao número de qubits, exigindo a caracterização empírica de sua viabilidade técnica frente a métodos consolidados."
-    )], jc="both", first_line=708, space_after=90, line_spacing=300))
+        "A computação quântica baseada em circuitos variacionais híbridos tem sido amplamente investigada para explorar novos paradigmas "
+        "de otimização sob as restrições da era NISQ (Noisy Intermediate-Scale Quantum), caracterizada por conectividade limitada e presença "
+        "de ruído (Bharti et al., 2022). Embora o aprendizado supervisionado convencional opere tradicionalmente em espaços contínuos por "
+        "meio de otimização convexa, a representação de tarefas de classificação sob formalismos combinatórios discretos viabiliza sua "
+        "resolução em arquiteturas quânticas através de matrizes de interação quadrática (Grange; Poss; Bourreau, 2024).", font_size=21
+    )], jc="both", first_line=708, space_after=80, line_spacing=260))
 
     body_elements.append(make_p([make_run(
-        "O objetivo deste trabalho é avaliar o desempenho do algoritmo QAOA (Quantum Approximate Optimization Algorithm) na resolução de problemas de classificação binária formulados como QUBO (Quadratic Unconstrained Binary Optimization), analisando a acurácia de generalização e o tempo computacional em simuladores quânticos. Especificamente, busca-se: 1) mapear a função de custo de um classificador linear discretizado para uma matriz QUBO com penalidades quadráticas; 2) contrastar as métricas de convergência do QAOA com o classificador SVM clássico e com o classificador quântico variacional (VQC); e 3) quantificar a escalabilidade temporal da abordagem frente ao incremento da dimensionalidade de entrada via componentes principais (PCA)."
-    )], jc="both", first_line=708, space_after=90, line_spacing=300))
+        "Nesse contexto, cabe distinguir duas vertentes fundamentais do aprendizado de máquina quântico: enquanto classificadores "
+        "quânticos variacionais (VQC) ajustam os parâmetros contínuos de rotação de um circuito quântico classificador atuando sobre "
+        "espaços de Hilbert (Havlíček et al., 2019; Schuld; Killoran, 2019), a abordagem baseada no algoritmo QAOA (Quantum Approximate "
+        "Optimization Algorithm) utiliza circuitos quânticos parametrizados para encontrar as configurações binárias que minimizam uma "
+        "função de custo combinatória mapeada para QUBO (Quadratic Unconstrained Binary Optimization) (Farhi; Goldstone; Gutmann, 2014; "
+        "Glover; Kochenberger; Du, 2019). Em simuladores clássicos por vetores de estado, contudo, a representação exata de 2", font_size=21
+    ), make_run("n", font_size=21, vert_align="superscript"), make_run(
+        " amplitudes impõe um crescimento exponencial no tempo de processamento conforme o registrador de qubits se expande, exigindo a caracterização "
+        "empírica de sua escalabilidade perante métodos consolidados.", font_size=21
+    )], jc="both", first_line=708, space_after=80, line_spacing=260))
 
     body_elements.append(make_p([make_run(
-        "Essa abordagem fundamenta a investigação empírica do QAOA frente a baselines consolidados: postula-se que a formulação QUBO preserva a capacidade discriminativa em instâncias controladas, embora o custo de simulação clássica limite a profundidade e a dimensionalidade operacional perante algoritmos tradicionais."
-    )], jc="both", first_line=708, space_after=140, line_spacing=300))
+        "O objetivo deste estudo é avaliar o desempenho do algoritmo QAOA na resolução de tarefas de classificação binária formuladas "
+        "como QUBO, analisando a acurácia de generalização observada e o tempo computacional em simuladores quânticos frente ao SVM linear "
+        "clássico e ao VQC simulado. O escopo compreende: 1) mapear a perda de um classificador linear discretizado para uma matriz QUBO com "
+        "penalidades quadráticas; 2) verificar o impacto da prevenção rigorosa de vazamento de dados (data leakage) no fluxo de "
+        "pré-processamento via Análise de Componentes Principais (PCA, do inglês Principal Component Analysis); 3) comparar o desempenho "
+        "observado e os valores de custo atingidos pelo QAOA e por um solver combinatorial exato; e 4) delimitar a escalabilidade da "
+        "simulação clássica, avaliando o QAOA em instâncias de 2 a 4 componentes PCA e o solver exato até 5 componentes.", font_size=21
+    )], jc="both", first_line=708, space_after=120, line_spacing=260))
 
+    # 2 REVISÃO DE LITERATURA
     body_elements.append(make_heading_1("2 REVISÃO DE LITERATURA", num=False))
     body_elements.append(make_p([make_run(
-        "Algoritmos quânticos variacionais (VQAs) empregam circuitos parametrizados cuja energia esperada é avaliada em processadores quânticos e atualizada iterativamente por rotinas clássicas de otimização (Bharti et al., 2022; Cerezo et al., 2021). O algoritmo QAOA, formulado originalmente por Farhi, Goldstone e Gutmann (2014), alterna a aplicação de operadores Hamiltonianos de custo e de mistura para conduzir o estado inicial a uma configuração que aproxima o mínimo de uma função combinatorial. Em tarefas de classificação, o aprendizado quântico tradicional explora espaços de Hilbert através de mapas de características e ansätze variacionais (Havlíček et al., 2019; Schuld; Killoran, 2019). No entanto, a modelagem direta da perda de classificação como uma função quadrática binária viabiliza a aplicação de amostradores e solvers quânticos combinatórios (Grange; Poss; Bourreau, 2024)."
-    )], jc="both", first_line=708, space_after=90, line_spacing=300))
+        "Algoritmos quânticos variacionais (VQAs) utilizam circuitos parametrizados cuja energia esperada é mensurada e otimizada "
+        "iterativamente por rotinas clássicas (Cerezo et al., 2021). O algoritmo QAOA, proposto por Farhi, Goldstone e Gutmann (2014), "
+        "alterna operadores Hamiltonianos de custo e de mistura para guiar o estado quântico em direção à solução ótima de problemas "
+        "combinatórios discretos. Em classificação, o paradigma dominante explora mapas de características quânticos (Havlíček et al., "
+        "2019; Schuld; Killoran, 2019). Todavia, a modelagem de fronteiras de decisão como problemas quadráticos irrestritos viabiliza o "
+        "emprego direto de otimizadores combinatórios quânticos (Grange; Poss; Bourreau, 2024).", font_size=21
+    )], jc="both", first_line=708, space_after=80, line_spacing=260))
 
     body_elements.append(make_p([make_run(
-        "O paradigma QUBO expressa problemas de otimização discreta como formas quadráticas sobre vetores binários, equivalendo à representação do modelo de Ising (Glover; Kochenberger; Du, 2019; Lucas, 2014). Mapeamentos de Support Vector Machines para QUBO permitem explorar o espaço de parâmetros por meio de relaxações discretas (Guddanti et al., 2024). Em simulações clássicas de circuitos quânticos, a compressão dimensional prévia via PCA é indispensável para conter o dimensionamento do registrador de qubits e evitar a degradação temporal das rotinas de otimização (Mancilla; Pere, 2022; Qi et al., 2025). A escolha de otimizadores clássicos como COBYLA e SPSA determina a eficiência da convergência sob diferentes superfícies de custo e perturbações de amostragem (AL Ajmi; Shoaib, 2025; Spall, 1992)."
-    )], jc="both", first_line=708, space_after=140, line_spacing=300))
+        "O formalismo QUBO mapeia problemas de otimização combinatória sobre vetores booleanos, mantendo equivalência direta com o modelo "
+        "físico de Ising (Glover; Kochenberger; Du, 2019; Lucas, 2014). Mapeamentos de classificadores do tipo Support Vector Machine para "
+        "QUBO permitem explorar o espaço discreto de parâmetros (Guddanti et al., 2024). Em plataformas clássicas de simulação quântica, a "
+        "redução prévia de dimensionalidade por PCA é indispensável para conter a dimensão do registrador de qubits e viabilizar a "
+        "convergência das rotinas de otimização (Mancilla; Pere, 2022; Qi et al., 2025). Ademais, a seleção e a tolerância de otimizadores "
+        "clássicos como COBYLA e SPSA governam a estabilidade da convergência em circuitos variacionais (AL Ajmi; Shoaib, 2025; Spall, 1992).", font_size=21
+    )], jc="both", first_line=708, space_after=120, line_spacing=260))
 
+    # 3 METODOLOGIA
     body_elements.append(make_heading_1("3 METODOLOGIA", num=False))
     body_elements.append(make_p([make_run(
-        "O protocolo experimental foi implementado em Python utilizando as bibliotecas scikit-learn (v1.4) e Qiskit (Qiskit v1.0, Qiskit Algorithms e Qiskit Optimization). Empregou-se o conjunto de dados breast cancer, extraindo-se uma amostra estratificada de 100 instâncias particionada em 70% para treinamento e 30% para teste com semente pseudoaleatória controlada (random_state = 42). O fluxo de pré-processamento consistiu em padronização por escore Z (StandardScaler ajustado no treino), redução de dimensionalidade por PCA e normalização linear no intervalo [0, 1] com MinMaxScaler."
-    )], jc="both", first_line=708, space_after=90, line_spacing=300))
+        "O protocolo experimental utilizou o conjunto de dados breast cancer da biblioteca scikit-learn (569 instâncias, 30 atributos). "
+        "Extraiu-se uma subamostra estratificada de 100 instâncias, preservando a proporção de 37 amostras da classe 0 (maligno) e 63 da "
+        "classe 1 (benigno). Essa amostra foi particionada com estratificação em 70% para treinamento (N = 70: 26 classe 0 e 44 classe 1) "
+        "e 30% para teste (30 instâncias: 11 classe 0 e 19 classe 1), fixando a semente pseudoaleatória controlada (random_state = 42). "
+        "Para evitar estritamente qualquer vazamento de dados (data leakage), o fluxo de pré-processamento foi ajustado exclusivamente "
+        "no conjunto de treino: a padronização por escore Z (StandardScaler), a redução dimensional por PCA e o reescalonamento no "
+        "intervalo [0, 1] (MinMaxScaler) foram calibrados no treino e subsequentemente aplicados à partição de teste.", font_size=21
+    )], jc="both", first_line=708, space_after=80, line_spacing=260))
+
+    p2_runs = [
+        make_run("Na formulação combinatória, o hiperplano de separação linear foi discretizado representando cada coeficiente de peso ", font_size=21),
+        make_run("w", italic=True, font_size=21),
+        make_run("j", italic=True, font_size=21, vert_align="subscript"),
+        make_run(" (", font_size=21),
+        make_run("j", italic=True, font_size=21),
+        make_run(" ∈ {1, ..., ", font_size=21),
+        make_run("d", italic=True, font_size=21),
+        make_run("}) e o viés ", font_size=21),
+        make_run("b", italic=True, font_size=21),
+        make_run(" por variáveis binárias booleanas que codificam magnitudes positivas e negativas: ", font_size=21),
+        make_run("w", italic=True, font_size=21),
+        make_run("j", italic=True, font_size=21, vert_align="subscript"),
+        make_run(" = ", font_size=21),
+        make_run("s", italic=True, font_size=21),
+        make_run(" · (", font_size=21),
+        make_run("b", italic=True, font_size=21),
+        make_run("j", italic=True, font_size=21, vert_align="subscript"),
+        make_run("(+)", font_size=21, vert_align="superscript"),
+        make_run(" - ", font_size=21),
+        make_run("b", italic=True, font_size=21),
+        make_run("j", italic=True, font_size=21, vert_align="subscript"),
+        make_run("(-)", font_size=21, vert_align="superscript"),
+        make_run(") e ", font_size=21),
+        make_run("b", italic=True, font_size=21),
+        make_run(" = ", font_size=21),
+        make_run("s", italic=True, font_size=21),
+        make_run(" · (", font_size=21),
+        make_run("b", italic=True, font_size=21),
+        make_run("0", font_size=21, vert_align="subscript"),
+        make_run("(+)", font_size=21, vert_align="superscript"),
+        make_run(" - ", font_size=21),
+        make_run("b", italic=True, font_size=21),
+        make_run("0", font_size=21, vert_align="subscript"),
+        make_run("(-)", font_size=21, vert_align="superscript"),
+        make_run("), onde ", font_size=21),
+        make_run("b", italic=True, font_size=21),
+        make_run("k", italic=True, font_size=21, vert_align="subscript"),
+        make_run("(+)", font_size=21, vert_align="superscript"),
+        make_run(", ", font_size=21),
+        make_run("b", italic=True, font_size=21),
+        make_run("k", italic=True, font_size=21, vert_align="subscript"),
+        make_run("(-)", font_size=21, vert_align="superscript"),
+        make_run(" ∈ {0, 1}, com escala ", font_size=21),
+        make_run("s", italic=True, font_size=21),
+        make_run(" = 2,0 e 1 bit por sinal, totalizando ", font_size=21),
+        make_run("n", italic=True, font_size=21),
+        make_run("bin", font_size=21, vert_align="subscript"),
+        make_run(" = 2(", font_size=21),
+        make_run("d", italic=True, font_size=21),
+        make_run(" + 1) variáveis binárias para ", font_size=21),
+        make_run("d", italic=True, font_size=21),
+        make_run(" componentes PCA. A função objetivo minimizada adotou o critério de erro quadrático de margem com penalização L2 e exclusão mútua de polaridade, conforme apresentado na Equação (1):", font_size=21)
+    ]
+    body_elements.append(make_p(p2_runs, jc="both", first_line=708, space_after=60, line_spacing=260))
+
+    # Inserção da Equação em OMML nativo (Word Equation)
+    body_elements.append(make_equation())
+
+    p3_runs = [
+        make_run("onde ", font_size=21),
+        make_run("N", italic=True, font_size=21),
+        make_run(" = 70 é o número de amostras de treino, ", font_size=21),
+        make_run("y", italic=True, font_size=21),
+        make_run("i", italic=True, font_size=21, vert_align="subscript"),
+        make_run(" ∈ {-1, +1} denota o rótulo de classe, ", font_size=21),
+        make_run("λ", italic=True, font_size=21),
+        make_run("reg", font_size=21, vert_align="subscript"),
+        make_run(" = 0,05 é o hiperparâmetro de regularização L2 aplicado a todos os coeficientes (incluindo o intercepto) e ", font_size=21),
+        make_run("λ", italic=True, font_size=21),
+        make_run("mut", font_size=21, vert_align="subscript"),
+        make_run(" = 0,25 penaliza a ativação concorrente de bits de sinal oposto do mesmo coeficiente. A classe prevista para uma amostra de teste é obtida pelo sinal do score linear: ", font_size=21),
+        make_run("ŷ", italic=True, font_size=21),
+        make_run(" = 1 se (", font_size=21),
+        make_run("b", italic=True, font_size=21),
+        make_run(" + ∑", font_size=21),
+        make_run("j=1", font_size=21, vert_align="subscript"),
+        make_run("d", font_size=21, vert_align="superscript"),
+        make_run(" ", font_size=21),
+        make_run("x", italic=True, font_size=21),
+        make_run("ij", italic=True, font_size=21, vert_align="subscript"),
+        make_run(" · ", font_size=21),
+        make_run("w", italic=True, font_size=21),
+        make_run("j", italic=True, font_size=21, vert_align="subscript"),
+        make_run(") ≥ 0,0, e ", font_size=21),
+        make_run("ŷ", italic=True, font_size=21),
+        make_run(" = 0 caso contrário, mapeando formalmente o limiar zero para a classe 1.", font_size=21)
+    ]
+    body_elements.append(make_p(p3_runs, jc="both", first_line=708, space_after=80, line_spacing=260))
 
     body_elements.append(make_p([make_run(
-        "Para o baseline de referência, utilizou-se um SVM linear clássico e um modelo VQC composto pelo mapa de características ZZFeatureMap, ansatz variacional RealAmplitudes e otimizador SPSA com 100 iterações. Na formulação combinatória, o hiperplano de separação linear foi discretizado representando cada coeficiente w_j e o viés b por um par de variáveis binárias que codificam magnitudes positivas e negativas: c_k = s · (b_k^(+) - b_k^(-)), com escala s = 2,0 e 1 bit de resolução por sinal, totalizando n_bin = 2(d + 1) variáveis booleanas para d componentes PCA."
-    )], jc="both", first_line=708, space_after=90, line_spacing=300))
+        "O protocolo computacional foi executado em ambiente Linux x86_64 dual-core (2 vCPUs @ 2,8 GHz, 8 GB RAM) sob Python 3.10+, "
+        "empregando scikit-learn v1.4, qiskit v1.0, qiskit-algorithms v0.3.0, qiskit-optimization v0.6.1 e qiskit-machine-learning v0.7.2. "
+        "O classificador clássico utilizou SVC(kernel='linear', C=1.0). O modelo VQC simulado adotou ZZFeatureMap(reps=1), ansatz "
+        "RealAmplitudes(reps=1) (profundidade total de 6 camadas lógicas) e otimizador SPSA (maxiter=100, inicialização em 0,1, semente 42). "
+        "O QAOA foi configurado com 1 camada (p = 1), ponto inicial dos ângulos (γ, β) fixado em 0,1, e simulador analítico "
+        "StatevectorSampler(seed=42) operando no regime ideal exato (sem ruído e shots analíticos). O otimizador clássico COBYLA foi configurado "
+        "com os limites: 20 iterações em PCA = 2, 20 iterações em PCA = 3 e 5 iterações em PCA = 4; a instância com PCA = 5 não foi submetida "
+        "ao QAOA devido à projeção temporal. A solução binária retornada pelo QAOA é selecionada pelo MinimumEigenOptimizer, que extrai o "
+        "autoestado de menor energia da função objetivo. Cada configuração empírica foi avaliada em uma única execução experimental (N = 1); "
+        "os tempos reportados medem exclusivamente o processo de otimização/treinamento e inferência.", font_size=21
+    )], jc="both", first_line=708, space_after=120, line_spacing=260))
 
-    body_elements.append(make_p([make_run(
-        "A função objetivo minimizada adotou o critério de erro quadrático de margem com termos de regularização e penalidade de exclusão mútua de sinal: H = (1 / N) * ∑ (b + ∑ x_ij · w_j - y_i)² + λ_reg · ∑ w_j² + λ_mut · ∑ (b_k^(+) · b_k^(-)), onde y_i ∈ {-1, +1} denota o rótulo da classe, λ_reg = 0,05 é a regularização L2 de pesos e λ_mut = 0,25 é a penalidade que impede a ativação simultânea de bits de polaridade oposta do mesmo coeficiente. A matriz resultante foi solucionada pelo QAOA com uma repetição (p = 1), operador StatevectorSampler e otimizador COBYLA, contrastando-se com um solver exato por enumeração completa de 2⁶ a 2¹² estados."
-    )], jc="both", first_line=708, space_after=140, line_spacing=300))
-
+    # 4 RESULTADOS E DISCUSSÕES
     body_elements.append(make_heading_1("4 RESULTADOS E DISCUSSÕES", num=False))
     body_elements.append(make_p([make_run(
-        "A Tabela 1 consolida os resultados dos baselines e da formulação combinatória para a instância com 2 componentes PCA (6 variáveis binárias). O SVM linear clássico alcançou acurácia de 100,00% em 0,0009 segundos, enquanto o VQC simulado obteve 83,33% em 12,8098 segundos. Tanto o solver exato quanto o QAOA convergiram para 90,00% de acurácia de teste, demonstrando que a discretização de parâmetros preserva a fronteira de decisão essencial, com o QAOA executando em 3,6997 segundos no simulador."
-    )], jc="both", first_line=708, space_after=90, line_spacing=300))
+        "A Tabela 1 apresenta o desempenho dos baselines e da formulação combinatória na partição de teste para a configuração com 2 componentes "
+        "PCA (6 variáveis binárias). O SVM linear clássico obteve 100,00% de acurácia em 0,0010 s, enquanto o VQC simulado atingiu 83,33% em "
+        "12,8098 s. Tanto o solver exato por busca exaustiva quanto o QAOA convergiram rigorosamente para o mesmo valor ótimo da função objetivo "
+        "no treino (f", font_size=21
+    ), make_run("val", font_size=21, vert_align="subscript"), make_run(
+        " = 0,8736) e atingiram 90,00% de acurácia observada no teste, comprovando que a discretização proposta preserva a "
+        "capacidade discriminativa essencial do modelo linear, com o QAOA concluindo a otimização em 3,6997 s.", font_size=21
+    )], jc="both", first_line=708, space_after=80, line_spacing=260))
 
-    t1_headers = ["Modelo", "Paradigma", "Vars Binárias", "Acurácia", "Tempo (s)"]
+    t1_headers = ["Modelo", "Paradigma", "Vars", "f_val Treino", "Acurácia Teste", "Tempo (s)"]
     t1_rows = [
-        ["SVM linear", "Clássico", "-", "100,00%", "0,0009 s"],
-        ["VQC simulado", "Quântico Variacional", "-", "83,33%", "12,8098 s"],
-        ["QUBO Solver Exato", "Clássico Exaustivo", "6", "90,00%", "0,0824 s"],
-        ["QAOA-QUBO linear", "Quântico Combinatório", "6", "90,00%", "3,6997 s"]
+        ["SVM linear", "Clássico", "-", "-", "100,00%", "0,0010 s"],
+        ["VQC simulado", "Quântico Variacional", "-", "-", "83,33%", "12,8098 s"],
+        ["QUBO Solver Exato", "Clássico Exaustivo", "6", "0,8736", "90,00%", "0,0824 s"],
+        ["QAOA-QUBO linear", "Quântico Combinatório", "6", "0,8736", "90,00%", "3,6997 s"]
     ]
-    body_elements.append(make_table(t1_headers, t1_rows, "Tabela 1: Desempenho comparativo dos modelos no conjunto de teste (PCA = 2)."))
+    body_elements.append(make_table(t1_headers, t1_rows, "Tabela 1: Desempenho comparativo dos modelos no conjunto de teste (PCA = 2, N = 1)."))
 
     body_elements.append(make_p([make_run(
-        "A Tabela 2 apresenta a escalabilidade computacional variando o número de componentes PCA de 2 a 5. O solver exato manteve acurácia invariante de 90,00% em todas as configurações, com tempo de busca escalando de 0,0824 s (6 variáveis, 64 estados) a 7,1497 s (12 variáveis, 4.096 estados). Em contrapartida, a emulação do QAOA apresentou acentuada sensibilidade dimensional: o tempo elevou-se para 41,7146 s em PCA = 3 (8 variáveis) e para 863,4231 s em PCA = 4 (10 variáveis, 1.024 estados quânticos), forçando a redução do COBYLA para 5 iterações para viabilizar a conclusão do experimento."
-    )], jc="both", first_line=708, space_after=90, line_spacing=300))
+        "A Tabela 2 consolida a escalabilidade computacional variando os componentes PCA de 2 a 5. O solver exato manteve o valor ótimo da "
+        "função objetivo (f", font_size=21
+    ), make_run("val", font_size=21, vert_align="subscript"), make_run(
+        " = 0,8736) e acurácia observada constante de 90,00% em todas as instâncias, com o tempo escalando de 0,0824 s "
+        "(6 variáveis, 64 estados) até 7,1497 s (12 variáveis, 4.096 estados). No solver exato, a manutenção de f", font_size=21
+    ), make_run("val", font_size=21, vert_align="subscript"), make_run(
+        " = 0,8736 de 2 a 5 componentes decorre da resolução discreta adotada (w", font_size=21
+    ), make_run("j", font_size=21, vert_align="subscript"), make_run(
+        " ∈ {-2, 0, +2}) sob regularização L2, na qual o ótimo global atribui peso zero aos componentes adicionais de menor variância. O QAOA simulado acompanhou o ótimo global em PCA = 2 e PCA = 3 "
+        "(8 variáveis, 256 estados), alcançando f", font_size=21
+    ), make_run("val", font_size=21, vert_align="subscript"), make_run(
+        " = 0,8736 e 90,00% de acurácia em 41,7146 s. Para PCA = 4 (10 variáveis, 1.024 estados), a "
+        "restrição a 5 iterações do COBYLA levou a um tempo de 863,4231 s (~14,4 min) e resultou em uma solução subótima no treino "
+        "(f", font_size=21
+    ), make_run("val", font_size=21, vert_align="subscript"), make_run(
+        " = 0,8764 contra 0,8736 do exato). A configuração com 5 componentes não foi executada via QAOA devido ao limite de tempo imposto pelo ambiente.", font_size=21
+    )], jc="both", first_line=708, space_after=80, line_spacing=260))
 
-    t2_headers = ["PCA", "Vars", "Espaço de Estados", "Solver Exato (Tempo / Ac.)", "QAOA Simulado (Tempo / Ac.)"]
+    t2_headers = ["PCA", "Vars", "Espaço (2^n)", "Solver Exato (Tempo / f_val / Ac.)", "QAOA Simulado (Tempo / f_val / Ac.)"]
     t2_rows = [
-        ["2", "6", "64 estados (2⁶)", "0,0824 s  /  90,00%", "3,6997 s  /  90,00%"],
-        ["3", "8", "256 estados (2⁸)", "0,4580 s  /  90,00%", "41,7146 s  /  90,00%"],
-        ["4", "10", "1.024 estados (2¹⁰)", "1,2578 s  /  90,00%", "863,4231 s* / 96,67%"],
-        ["5", "12", "4.096 estados (2¹²)", "7,1497 s  /  90,00%", "-  (limite de simulação)"]
+        ["2", "6", "64 estados (2⁶)", "0,0824 s  /  0,8736  /  90,00%", "3,6997 s  /  0,8736  /  90,00%"],
+        ["3", "8", "256 estados (2⁸)", "0,4580 s  /  0,8736  /  90,00%", "41,7146 s  /  0,8736  /  90,00%"],
+        ["4", "10", "1.024 estados (2¹⁰)", "1,2578 s  /  0,8736  /  90,00%", "863,4231 s* / 0,8764 / 96,67%"],
+        ["5", "12", "4.096 estados (2¹²)", "7,1497 s  /  0,8736  /  90,00%", "Não executado (limite de recurso)"]
     ]
     body_elements.append(make_table(t2_headers, t2_rows, "Tabela 2: Escalabilidade computacional da formulação QUBO sob variação de componentes PCA."))
-    body_elements.append(make_p([make_run("Nota: * Otimizador COBYLA limitado a 5 iterações por restrição de tempo de simulação.", italic=True, font_size=18)], jc="both", first_line=0, space_after=80, line_spacing=200))
+    body_elements.append(make_p([make_run("Nota: * COBYLA limitado a 5 iterações; tempos reportados para uma única execução (N = 1).", italic=True, font_size=18)], jc="both", first_line=0, space_before=40, space_after=100, line_spacing=200))
 
     body_elements.append(make_p([make_run(
-        "Na instância com 4 componentes, o QAOA registrou acurácia nominal de 96,67% (29 acertos em 30 amostras), superando a taxa de 90,00% do solver exato. Esse desvio resulta da aproximação estocástica do QAOA sobre o conjunto de treino que, pela discretização em passos de 2,0, produziu um ligeiro deslocamento do limiar do hiperplano que coincidiu com a classificação correta de duas instâncias limítrofes na partição de teste reduzida (flutuação amostral). Os resultados confirmam a convergência funcional do modelo QUBO e evidenciam que o gargalo operacional reside na multiplicação matricial clássica exigida para emular processadores quânticos."
-    )], jc="both", first_line=708, space_after=140, line_spacing=300))
+        "Na instância com 4 componentes, o QAOA registrou acurácia nominal de 96,67% (29 acertos em 30 amostras), superando a taxa de 90,00% "
+        "obtida pela solução matematicamente ótima do solver exato. Atribui-se essa elevação pontual à hipótese de flutuação amostral decorrente "
+        "da partição de teste reduzida (30 instâncias): ao interromper a busca em uma solução ligeiramente subótima no treino (f", font_size=21
+    ), make_run("val", font_size=21, vert_align="subscript"), make_run(
+        " = 0,8764), o deslocamento marginal do hiperplano classificou corretamente duas instâncias limítrofes adicionais. "
+        "Os dados evidenciam a adequação da modelagem QUBO e demonstram que o custo de simulação clássica de vetores de estado em 2", font_size=21
+    ), make_run("n", font_size=21, vert_align="superscript"), make_run(
+        " amplitudes constitui o fator limitante para a expansão do QAOA a dimensões superiores em computadores tradicionais.", font_size=21
+    )], jc="both", first_line=708, space_after=120, line_spacing=260))
 
-    body_elements.append(make_heading_1("5 CONCLUSÃO", num=False))
+    # 5 CONCLUSÃO
+    body_elements.append(make_heading_1("5 CONCLUSÃO", num=False, space_before=200, space_after=100))
     body_elements.append(make_p([make_run(
-        "Este trabalho avaliou a transposição de modelos de classificação binária supervisionada para o paradigma combinatório QUBO resolvido por QAOA em simuladores quânticos. Os experimentos confirmaram a viabilidade funcional da formulação discreta, atingindo acurácia de 90,00% com 2 componentes PCA e mantendo a estabilidade preditiva no solver exato em todas as dimensões analisadas."
-    )], jc="both", first_line=708, space_after=90, line_spacing=300))
+        "Este trabalho avaliou a modelagem de tarefas de classificação supervisionada binária no paradigma combinatório QUBO resolvidas por "
+        "QAOA em simuladores quânticos analíticos. Os resultados observados confirmaram a viabilidade da discretização de hiperplanos lineares, "
+        "alcançando o mesmo valor ótimo de função objetivo (0,8736) e 90,00% de acurácia em instâncias de 2 e 3 componentes PCA, com o solver "
+        "exato assegurando a estabilidade da formulação até 5 componentes.", font_size=21
+    )], jc="both", first_line=708, space_after=80, line_spacing=260))
 
     body_elements.append(make_p([make_run(
-        "O confronto com o SVM clássico confirmou a hipótese norteadora: enquanto o classificador tradicional treina em milissegundos, o QAOA simulado enfrenta severa restrição de escalabilidade decorrente do custo exponencial de cálculo de vetores de estado em CPUs clássicas. Conclui-se que a formulação QUBO proposta preserva as propriedades discriminativas da classificação linear, mas sua aplicabilidade prática em problemas de maior escala dependerá da execução nativa em hardware quântico da era NISQ."
-    )], jc="both", first_line=708, space_after=140, line_spacing=300))
+        "A investigação empírica caracterizou os limites operacionais da abordagem: o QAOA foi avaliado de 2 a 4 componentes, "
+        "registrando aumento substancial de tempo de 3,70 s para 863,42 s, enquanto a dimensão com 5 componentes foi restrita ao solver exato. "
+        "Conclui-se que a formulação QUBO representa fielmente tarefas de classificação linear sem vazamento de dados, mas o escalonamento "
+        "prático do QAOA em instâncias maiores dependerá de execuções em processadores quânticos físicos ou do emprego de simuladores por "
+        "tensores e amostragem aproximada em trabalhos futuros.", font_size=21
+    )], jc="both", first_line=708, space_after=120, line_spacing=260))
 
-    body_elements.append(make_heading_1("REFERÊNCIAS", num=False))
+    # REFERÊNCIAS
+    body_elements.append(make_heading_1("REFERÊNCIAS", num=False, space_before=160, space_after=80))
     refs = [
         "AL AJMI, N. A.; SHOAIB, M. Optimization Strategies in Quantum Machine Learning: A Performance Analysis. Applied Sciences, v. 15, n. 8, p. 4493, 2025.",
         "BHARTI, K. et al. Noisy intermediate-scale quantum algorithms. Reviews of Modern Physics, v. 94, n. 1, p. 015004, 2022.",
@@ -260,46 +502,24 @@ def build_document_xml():
         "SPALL, J. C. Multivariate stochastic approximation using a simultaneous perturbation gradient approximation. IEEE Transactions on Automatic Control, v. 37, n. 3, p. 332–341, 1992."
     ]
     for ref in refs:
-        body_elements.append(make_p([make_run(ref, font_size=20)], jc="both", first_line=0, space_after=50, line_spacing=220))
+        body_elements.append(make_p([make_run(ref, font_size=19)], jc="both", first_line=0, space_after=40, line_spacing=210))
 
-    body_elements.append(make_heading_1("AGRADECIMENTOS", num=False))
+    # AGRADECIMENTOS
+    body_elements.append(make_heading_1("AGRADECIMENTOS", num=False, space_before=160, space_after=80))
     body_elements.append(make_p([make_run(
-        "Agradece-se à Faculdade de Tecnologia SENAI Gaspar Ricardo Júnior pelo suporte institucional e de infraestrutura concedido ao desenvolvimento desta pesquisa."
-    )], jc="both", first_line=708, space_after=140, line_spacing=300))
+        "Agradece-se à Faculdade de Tecnologia SENAI Gaspar Ricardo Júnior pelo suporte institucional e de infraestrutura concedido ao desenvolvimento desta pesquisa.", font_size=21
+    )], jc="both", first_line=708, space_after=120, line_spacing=260))
 
-    body_elements.append(make_heading_1("SOBRE O(S)AUTOR(ES)", num=False))
-    body_elements.append(make_p([make_run("Sobre os autores:", bold=True, font_size=22)], jc="both", first_line=0, space_after=40, line_spacing=220))
-    body_elements.append(make_p([make_run("_________________", bold=True, font_size=22)], jc="both", first_line=0, space_after=80, line_spacing=220))
+    # SOBRE OS AUTORES
+    body_elements.append(make_heading_1("SOBRE O(S) AUTOR(ES)", num=False, space_before=160, space_after=80))
+    body_elements.append(make_p([make_run("Sobre os autores:", bold=True, font_size=20)], jc="both", first_line=0, space_before=60, space_after=35, line_spacing=210))
+    body_elements.append(make_p([make_run("_________________", bold=True, font_size=20)], jc="both", first_line=0, space_after=60, line_spacing=210))
 
-    body_elements.append(make_p([make_run("i Julio Coronetti Regino (Autor)", bold=True, font_size=22)], jc="both", first_line=0, space_after=40, line_spacing=220, pStyle="Textodenotadefim"))
-    author1_bio = (
-        '<w:tbl><w:tblPr><w:tblStyle w:val="Tabelacomgrade"/><w:tblW w:w="0" w:type="auto"/><w:tblBorders>'
-        '<w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/><w:insideH w:val="none"/><w:insideV w:val="none"/>'
-        '</w:tblBorders></w:tblPr>'
-        '<w:tblGrid><w:gridCol w:w="1418"/><w:gridCol w:w="7643"/></w:tblGrid>'
-        '<w:tr><w:tc><w:tcPr><w:tcW w:w="1418" w:type="dxa"/></w:tcPr>'
-        + make_p([make_run("Foto", font_size=18)], jc="center", first_line=0, space_after=0, line_spacing=200) +
-        '</w:tc><w:tc><w:tcPr><w:tcW w:w="7643" w:type="dxa"/></w:tcPr>'
-        + make_p([make_run("Discente do curso Superior de Tecnologia em Análise e Desenvolvimento de Sistemas na Faculdade de Tecnologia SENAI Gaspar Ricardo Júnior. Desenvolve pesquisa de Iniciação Científica focada em algoritmos variacionais quânticos (QAOA, VQC) e otimização combinatória (QUBO) aplicados a machine learning. E-mail: julio.regino2@senaisp.edu.br.", font_size=20)], jc="both", first_line=0, space_after=0, line_spacing=240) +
-        '</w:tc></w:tr></w:tbl>'
-    )
-    body_elements.append(author1_bio)
+    body_elements.append(make_p([make_run("i Julio Coronetti Regino (Autor)", bold=True, font_size=20)], jc="both", first_line=0, space_before=60, space_after=35, line_spacing=210, pStyle="Textodenotadefim"))
+    body_elements.append(make_p([make_run("Discente do curso Superior de Tecnologia em Análise e Desenvolvimento de Sistemas na Faculdade de Tecnologia SENAI Gaspar Ricardo Júnior. Desenvolve pesquisa de Iniciação Científica focada em algoritmos variacionais quânticos (QAOA, VQC) e otimização combinatória (QUBO) aplicados a machine learning. E-mail: julio.regino2@senaisp.edu.br.", font_size=19)], jc="both", first_line=0, space_after=80, line_spacing=230))
 
-    body_elements.append(make_p([make_run("", font_size=12)], jc="both", first_line=0, space_after=40, line_spacing=200))
-
-    body_elements.append(make_p([make_run("ii Cainã Antunes (Orientador)", bold=True, font_size=22)], jc="both", first_line=0, space_after=40, line_spacing=220, pStyle="Textodenotadefim"))
-    author2_bio = (
-        '<w:tbl><w:tblPr><w:tblStyle w:val="Tabelacomgrade"/><w:tblW w:w="0" w:type="auto"/><w:tblBorders>'
-        '<w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/><w:insideH w:val="none"/><w:insideV w:val="none"/>'
-        '</w:tblBorders></w:tblPr>'
-        '<w:tblGrid><w:gridCol w:w="1418"/><w:gridCol w:w="7643"/></w:tblGrid>'
-        '<w:tr><w:tc><w:tcPr><w:tcW w:w="1418" w:type="dxa"/></w:tcPr>'
-        + make_p([make_run("Foto", font_size=18)], jc="center", first_line=0, space_after=0, line_spacing=200) +
-        '</w:tc><w:tc><w:tcPr><w:tcW w:w="7643" w:type="dxa"/></w:tcPr>'
-        + make_p([make_run("Docente e pesquisador na Faculdade de Tecnologia SENAI Gaspar Ricardo Júnior, atuando como orientador de projetos de iniciação científica e desenvolvimento tecnológico em inteligência artificial e computação avançada. E-mail: caina.silva@sp.senai.br.", font_size=20)], jc="both", first_line=0, space_after=0, line_spacing=240) +
-        '</w:tc></w:tr></w:tbl>'
-    )
-    body_elements.append(author2_bio)
+    body_elements.append(make_p([make_run("ii Cainã Antunes (Orientador)", bold=True, font_size=20)], jc="both", first_line=0, space_before=60, space_after=35, line_spacing=210, pStyle="Textodenotadefim"))
+    body_elements.append(make_p([make_run("Docente e pesquisador na Faculdade de Tecnologia SENAI Gaspar Ricardo Júnior, atuando como orientador de projetos de iniciação científica e desenvolvimento tecnológico em inteligência artificial e computação avançada. E-mail: caina.silva@sp.senai.br.", font_size=19)], jc="both", first_line=0, space_after=60, line_spacing=230))
 
     sectPr = '<w:sectPr w:rsidR="0046777C" w:rsidRPr="00FF5642" w:rsidSect="00A223E8"><w:headerReference w:type="default" r:id="rId7"/><w:footerReference w:type="default" r:id="rId8"/><w:type w:val="continuous"/><w:pgSz w:w="11910" w:h="16840"/><w:pgMar w:top="1701" w:right="1134" w:bottom="1134" w:left="1701" w:header="720" w:footer="906" w:gutter="0"/><w:cols w:space="720"/></w:sectPr>'
     body_elements.append(sectPr)
@@ -313,21 +533,21 @@ def build_document_xml():
     return doc_header + ''.join(body_elements) + doc_footer
 
 def convert():
-    print("Atualizando Resumo_Expandido_Julio_Regino_2026.docx com a estrutura exata do template...")
+    print("Atualizando Resumo_Expandido_Julio_Regino_2026.docx com as correções refinadas do Advisor...")
     new_doc_xml = build_document_xml()
     new_footnotes_xml = build_footnotes_xml()
     
-    with zipfile.ZipFile(TEMPLATE_PATH, 'r') as zin:
-        with zipfile.ZipFile(OUTPUT_PATH, 'w', compression=zipfile.ZIP_DEFLATED) as zout:
-            for item in zin.infolist():
-                if item.filename == 'word/document.xml':
-                    zout.writestr(item, new_doc_xml.encode('utf-8'))
-                elif item.filename == 'word/footnotes.xml':
-                    zout.writestr(item, new_footnotes_xml.encode('utf-8'))
-                else:
-                    zout.writestr(item, zin.read(item.filename))
-                    
-    print(f"Sucesso! Arquivo .docx atualizado em: {OUTPUT_PATH}")
+    for target in [OUTPUT_PATH, DIST_PATH]:
+        with zipfile.ZipFile(TEMPLATE_PATH, 'r') as zin:
+            with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED) as zout:
+                for item in zin.infolist():
+                    if item.filename == 'word/document.xml':
+                        zout.writestr(item, new_doc_xml.encode('utf-8'))
+                    elif item.filename == 'word/footnotes.xml':
+                        zout.writestr(item, new_footnotes_xml.encode('utf-8'))
+                    else:
+                        zout.writestr(item, zin.read(item.filename))
+        print(f"Sucesso! Arquivo .docx gerado em: {target}")
 
 if __name__ == '__main__':
     convert()
